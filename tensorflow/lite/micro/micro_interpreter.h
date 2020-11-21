@@ -161,6 +161,8 @@ class MicroInterpreter {
   // arena_used_bytes() + 16.
   size_t arena_used_bytes() const { return allocator_.used_bytes(); }
 
+  const Model* model_;
+
  protected:
   const MicroAllocator& allocator() const { return allocator_; }
   const TfLiteContext& context() const { return context_; }
@@ -177,7 +179,6 @@ class MicroInterpreter {
 
   NodeAndRegistration* node_and_registrations_ = nullptr;
 
-  const Model* model_;
   const MicroOpResolver& op_resolver_;
   ErrorReporter* error_reporter_;
   TfLiteContext context_ = {};
