@@ -161,7 +161,7 @@ class MicroInterpreter {
   // arena_used_bytes() + 16.
   size_t arena_used_bytes() const { return allocator_.used_bytes(); }
 
-  const Model* model_;
+  Model* model_;
 
  protected:
   const MicroAllocator& allocator() const { return allocator_; }
