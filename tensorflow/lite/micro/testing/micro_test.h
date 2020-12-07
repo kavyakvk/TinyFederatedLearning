@@ -73,7 +73,7 @@ extern tflite::ErrorReporter* reporter;
   tflite::ErrorReporter* reporter;             \
   }                                            \
                                                \
-  int main(int argc, char** argv) {            \
+  int tflite_micro_main(int argc, char** argv) {            \
     micro_test::tests_passed = 0;              \
     micro_test::tests_failed = 0;              \
     tflite::MicroErrorReporter error_reporter; \

@@ -23,7 +23,7 @@ limitations under the License.
 
 #include <functional>
 
-#include "fixedpoint/fixedpoint.h"
+#include "third_party/gemmlowp/fixedpoint/fixedpoint.h"
 #include "tensorflow/lite/kernels/internal/cppmath.h"
 #include "tensorflow/lite/kernels/internal/optimized/neon_check.h"
 #include "tensorflow/lite/kernels/internal/types.h"

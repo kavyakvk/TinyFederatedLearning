@@ -18,7 +18,7 @@ limitations under the License.
 #include <cstddef>
 #include <cstdint>
 
-#include "flatbuffers/flatbuffers.h"  // from @flatbuffers
+#include "third_party/flatbuffers/include/flatbuffers/flatbuffers.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/core/api/error_reporter.h"
 #include "tensorflow/lite/core/api/profiler.h"
@@ -161,8 +161,6 @@ class MicroInterpreter {
   // arena_used_bytes() + 16.
   size_t arena_used_bytes() const { return allocator_.used_bytes(); }
 
-  Model* model_;
-
  protected:
   const MicroAllocator& allocator() const { return allocator_; }
   const TfLiteContext& context() const { return context_; }
@@ -179,6 +177,7 @@ class MicroInterpreter {
 
   NodeAndRegistration* node_and_registrations_ = nullptr;
 
+  const Model* model_;
   const MicroOpResolver& op_resolver_;
   ErrorReporter* error_reporter_;
   TfLiteContext context_ = {};

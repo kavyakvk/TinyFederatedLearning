@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <cstdint>
 
-#include "flatbuffers/flatbuffers.h"  // from @flatbuffers
+#include "third_party/flatbuffers/include/flatbuffers/flatbuffers.h"
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/kernels/internal/compatibility.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
