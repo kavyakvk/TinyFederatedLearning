@@ -3,7 +3,7 @@ import syslog
 import time
 
 #The following line is for serial over GPIO
-port = '/dev/tty.usbmodem1411' # change this to what the Arduino Port is
+port = '/dev/cu.usbmodem142101' # change this to what the Arduino Port is
 
 
 ard = serial.Serial(port,9600,timeout=5) # default is baud 9600
@@ -30,5 +30,5 @@ while (i < 4):
     print (msg)
     i = i + 1
 else:
-    print "Exiting"
+    print("Exiting")
 exit()
