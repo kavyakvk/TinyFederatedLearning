@@ -112,27 +112,15 @@ void loop() {
     TF_LITE_REPORT_ERROR(error_reporter, "Image capture failed.");
   }
 
-  Serial.println("captured image finished.");
-  Serial.println("inference starting.");
-
   // Run the model on this input and make sure it succeeds.
   if (kTfLiteOk != interpreter->Invoke()) {
     TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
   }
 
-  Serial.println("inference finished.");
-
-  // Get the embedding from the feature extractor
   TfLiteTensor* output = interpreter->output(0);
 
-  TF_LITE_REPORT_ERROR(error_reporter,"Char array: %s", output->data);
-
-  RespondToDetection(error_reporter, 10, -10);
-
   // Process the inference results.
-  /*
   int8_t person_score = output->data.uint8[kPersonIndex];
   int8_t no_person_score = output->data.uint8[kNotAPersonIndex];
   RespondToDetection(error_reporter, person_score, no_person_score);
-  */
 }
