@@ -44,7 +44,7 @@ limitations under the License.
 // JPEGDecoder library
 #include <JPEGDecoder.h>
 // Serial print
-#include <Particle.h>
+//#include "Particle.h"
 
 // Checks that the Arducam library has been correctly configured
 #if !(defined OV5642_MINI_5MP_PLUS)
@@ -122,7 +122,7 @@ TfLiteStatus PerformCapture(tflite::ErrorReporter* error_reporter) {
 TfLiteStatus ReadData(tflite::ErrorReporter* error_reporter) {
   // This represents the total length of the JPEG data
   jpeg_length = myCAM.read_fifo_length();
-  //delay(2000);
+  delay(2000);
   TF_LITE_REPORT_ERROR(error_reporter, "Reading %d bytes from Arducam",
                        jpeg_length);
   // Ensure there's not too much data for our buffer
@@ -145,7 +145,10 @@ TfLiteStatus ReadData(tflite::ErrorReporter* error_reporter) {
   myCAM.CS_HIGH();
 
   // Serial print
-  Serial.println("Hello World");
+//  Serial.println("Hello World");
+//  TF_LITE_REPORT_ERROR(error_reporter, "" + 2);
+//  Serial.println("Hi");
+//  Serial.println(200);
 
   return kTfLiteOk;
 }
@@ -232,9 +235,21 @@ TfLiteStatus DecodeAndProcessImage(tflite::ErrorReporter* error_reporter,
         // The index of this pixel in our flat output buffer
         int index = (current_y * image_width) + current_x;
         image_data[index] = static_cast<int8_t>(gray_value);
+//        Serial.print(image_data[index]);
+//        Serial.print(" ");
       }
+//      Serial.println(mcu_row);
     }
+//    Serial.println(JpegDec.MCUHeight);
+  // Print out grayscale image_data
+//  for (int i = 0; i < sizeof(image_data); i++) {
+//    Serial.print(image_data[i]); 
+//    Serial.print(" ");
+//  }
+//  Serial.println();
+    delay(500);
   }
+  
   TF_LITE_REPORT_ERROR(error_reporter, "Image decoded and processed");
   return kTfLiteOk;
 }
