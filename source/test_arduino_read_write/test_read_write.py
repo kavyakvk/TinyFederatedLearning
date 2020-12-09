@@ -37,3 +37,6 @@ exit()
 
 # Embeddings (every image) pickle into a file 
 # Model weights (after 5 in a row) averaged together and then send back to arduino
+
+# 1. if we send data (embeddings) to arduino
+# 2. if we get embeddings from arduino, that means we need to wait like 30 seconds for each pic
