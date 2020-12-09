@@ -125,14 +125,20 @@ void loop() {
   // Get the embedding from the feature extractor
   TfLiteTensor* output = interpreter->output(0);
 
-  TF_LITE_REPORT_ERROR(error_reporter,"Char array: %s", output->data);
+//  TF_LITE_REPORT_ERROR(error_reporter,"Char array: %d", output->data.uint8);
 
   RespondToDetection(error_reporter, 10, -10);
 
   // Process the inference results.
-  /*
+
+  // Embedding
   int8_t person_score = output->data.uint8[kPersonIndex];
   int8_t no_person_score = output->data.uint8[kNotAPersonIndex];
-  RespondToDetection(error_reporter, person_score, no_person_score);
-  */
+  for(int i = 0; i < sizeof(output->data); i++){
+    Serial.print(output->data.uint8[i]);
+    Serial.print(" ");
+  }
+  Serial.println();
+//  RespondToDetection(error_reporter, person_score, no_person_score);
+  
 }

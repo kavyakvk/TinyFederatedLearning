@@ -32,3 +32,8 @@ while (i < 4):
 else:
     print ("Exiting")
 exit()
+
+
+
+# Embeddings (every image) pickle into a file 
+# Model weights (after 5 in a row) averaged together and then send back to arduino
