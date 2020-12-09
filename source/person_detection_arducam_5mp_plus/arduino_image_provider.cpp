@@ -236,7 +236,7 @@ TfLiteStatus DecodeAndProcessImage(tflite::ErrorReporter* error_reporter,
           int current_x = x_origin + mcu_col;
           // The index of this pixel in our flat output buffer
           int index = ((current_y * image_width) + current_x)*rgb_color;
-          image_data[index] = static_cast<int8_t>(gray_value);
+          image_data[index] = static_cast<int8_t>(gray_value / 255);  // rescale
         }
       }
     }
