@@ -202,30 +202,42 @@ TfLiteStatus DecodeAndProcessImage(tflite::ErrorReporter* error_reporter,
     int x_origin = relative_mcu_x * JpegDec.MCUWidth;
     int y_origin = relative_mcu_y * JpegDec.MCUHeight;
 
-    // Loop through the MCU's rows and columns
-    for (int mcu_row = 0; mcu_row < JpegDec.MCUHeight; mcu_row++) {
-      // The y coordinate of this pixel in the output index
-      int current_y = y_origin + mcu_row;
-      for (int mcu_col = 0; mcu_col < JpegDec.MCUWidth; mcu_col++) {
-        // Read the color of the pixel as 16-bit integer
-        color = *pImg++;
-        // Extract the color values (5 red bits, 6 green, 5 blue)
-        uint8_t r, g, b;
-        r = ((color & 0xF800) >> 11) * 8;
-        g = ((color & 0x07E0) >> 5) * 4;
-        b = ((color & 0x001F) >> 0) * 8;
-        // Convert to grayscale by calculating luminance
-        // See https://en.wikipedia.org/wiki/Grayscale for magic numbers
-        float gray_value = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+    for(int rgb_color = 0; rgb_color < 3; rgb_color++){
+      // Loop through the MCU's rows and columns
+      for (int mcu_row = 0; mcu_row < JpegDec.MCUHeight; mcu_row++) {
+        // The y coordinate of this pixel in the output index
+        int current_y = y_origin + mcu_row;
+        for (int mcu_col = 0; mcu_col < JpegDec.MCUWidth; mcu_col++) {
+          // Read the color of the pixel as 16-bit integer
+          color = *pImg++;
+          // Extract the color values (5 red bits, 6 green, 5 blue)
+          uint8_t r, g, b;
+          r = ((color & 0xF800) >> 11) * 8;
+          g = ((color & 0x07E0) >> 5) * 4;
+          b = ((color & 0x001F) >> 0) * 8;
+          // Convert to grayscale by calculating luminance
+          // See https://en.wikipedia.org/wiki/Grayscale for magic numbers
+          //float gray_value = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+          float gray_value = 0;
+          if(rgb_color == 0){
+            gray_value = r;
+          }
+          else if(rgb_color == 1){
+            gray_value = g;
+          }
+          else{
+            gray_value = b;
+          }
 
-        // Convert to signed 8-bit integer by subtracting 128.
-        gray_value -= 128;
+          // Convert to signed 8-bit integer by subtracting 128.
+          gray_value -= 128;
 
-        // The x coordinate of this pixel in the output image
-        int current_x = x_origin + mcu_col;
-        // The index of this pixel in our flat output buffer
-        int index = (current_y * image_width) + current_x;
-        image_data[index] = static_cast<int8_t>(gray_value);
+          // The x coordinate of this pixel in the output image
+          int current_x = x_origin + mcu_col;
+          // The index of this pixel in our flat output buffer
+          int index = ((current_y * image_width) + current_x)*rgb_color;
+          image_data[index] = static_cast<int8_t>(gray_value);
+        }
       }
     }
   }
