@@ -43,7 +43,8 @@ TfLiteTensor* input = nullptr;
 // signed value.
 
 // An area of memory to use for input, output, and intermediate arrays.
-constexpr int kTensorArenaSize = 115656;
+// constexpr int kTensorArenaSize = 115656;
+constexpr int kTensorArenaSize = 135000;
 static uint8_t tensor_arena[kTensorArenaSize];
 }  // namespace
 
@@ -134,7 +135,7 @@ void loop() {
   // Embedding
   int8_t person_score = output->data.uint8[kPersonIndex];
   int8_t no_person_score = output->data.uint8[kNotAPersonIndex];
-  for(int i = 0; i < sizeof(output->data); i++){
+  for(int i = 0; i < 256; i++){
     Serial.print(output->data.uint8[i]);
     Serial.print(" ");
   }
