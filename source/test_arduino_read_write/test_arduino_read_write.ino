@@ -28,7 +28,7 @@ void setup()
 
 void loop()
 {
-  readString[0] = '\0';
+  readString[0] = '\0';   // reset
   ndx = 0;
   while(!Serial.available()) {} // wait for data to arrive
   // serial read section
