@@ -125,12 +125,14 @@ void setup() {
   static int current_round = 0;
 
   // For getting embeddings and weights
-  static byte ndx = 0;  // For keeping track where in the char array to input
-  const byte numChars = 256;
-  char readString[numChars];
+  static int ndx = 0;  // For keeping track where in the char array to input
+  static int numChars = input_size * batch_size;
+  char readEmbeddingsString[numChars];
+  char readTruthsString[batch_size * output_size];
   bool endOfResponse = false; 
-  float embeddings_arr[10] = { };     // initialize all elements to 0
+  // float embeddings_arr[] = { };     // initialize all elements to 0
   char * pch;
+  char * pch_row;
   Serial.begin(9600);  // initialize serial communications at 9600 bps
 }
 
@@ -151,7 +153,7 @@ void loop() {
       TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
     }
 
-    Serial.println("inference finished.");
+    Serial.println("Inference finished.");
 
     // Get the embedding from the feature extractor
     TfLiteTensor* output = interpreter->output(0);
@@ -184,22 +186,22 @@ void loop() {
       FCLayer* NNmodel = &(devices[d]);
       
       //Get embedding, save into float** input_data (batch_size x input_size) and int** ground_truth (batch_size x ouput_size)
-      readString[0] = '\0';   // reset
+      readEmbeddingsString[0] = '\0';   // reset
       ndx = 0;
       endOfResponse = false;
       // Reading in embedding
       while(!Serial.available()) {} // wait for data to arrive
       // serial read section
-      while (Serial.available() > 0 && endOfResponse == false)
+      while (Serial.available() > 0 || endOfResponse == false)
       {
         if (Serial.available() > 0)
         {
           char c = Serial.read();  //gets one byte from serial buffer
-          readString[ndx] = c; //adds to the string
+          readEmbeddingsString[ndx] = c; //adds to the string
           ndx += 1;
           if (c == '\n'){
             endOfResponse = true;
-            Serial.println("A: Finished reading in embedding");
+            Serial.println("A: Finished reading in embeddings");
           }
         }
       }
@@ -208,7 +210,8 @@ void loop() {
 
       // Tokenize string and split by commas
       Serial.println("Splitting string for embedding");
-      pch = strtok (readString, ",");
+      double *embeddings_arr = new double[numChars];
+      pch = strtok (readEmbeddingsString, ",;");
       int embedding_index = 0;
       while (pch != NULL){
         embeddings_arr[embedding_index] = atof(pch);  // Store in array
@@ -223,52 +226,98 @@ void loop() {
         Serial.print(" ");
       }
       Serial.println("]");
+      Serial.println(sizeof(embeddings_arr));
 
-      //save embeddings to an array
-      double **input_data = new double*[NNmodel->batch_size];
-      int **ground_truth = new int*[NNmodel->batch_size]
-      for(int b = 0; b < NNmodel->batch_size; b++) {
-        input_data[b] = new double*[NNmodel->input_size];
-        ground_truth[b] = new double*[NNmodel->output_size];
-        for(int i = 0; i < NNmodel->input_size; i++){
-          input_data[b][i] = INPUT THE VALUE OF THE BTH EMBEDDING AT INDEX I;
-          ground_truth[b][i] = INPUT THE VALUE OF THE BTH GROUND TRUTH AT INDEX I;
+      // READ IN GROUND TRUTHS
+      //Get int** ground_truth (batch_size x ouput_size)
+      readTruthsString[0] = '\0';   // reset
+      ndx = 0;
+      endOfResponse = false;
+      // Reading in embedding
+      while(!Serial.available()) {} // wait for data to arrive
+      // serial read section
+      while (Serial.available() > 0 || endOfResponse == false)
+      {
+        if (Serial.available() > 0)
+        {
+          char c = Serial.read();  //gets one byte from serial buffer
+          readTruthsString[ndx] = c; //adds to the string
+          ndx += 1;
+          if (c == '\n'){
+            endOfResponse = true;
+            Serial.println("A: Finished reading in ground truths");
+          }
         }
       }
+
+      delay(500);
+
+      // Tokenize string and split by commas
+      Serial.println("Splitting string for ground truth");
+      double *embeddings_arr = new double[numChars];
+      pch = strtok (readEmbeddingsString, ",;");
+      int embedding_index = 0;
+      while (pch != NULL){
+        embeddings_arr[embedding_index] = atof(pch);  // Store in array
+        pch = strtok (NULL, ",");   // NULL tells it to continue reading from where it left off
+        embedding_index += 1;
+      }
+
+      // Print out array
+      Serial.print("Embeddings: [");
+      for (byte i = 0; i < (sizeof(embeddings_arr)/sizeof(embeddings_arr[0])); i++){
+        Serial.print(embeddings_arr[i]);
+        Serial.print(" ");
+      }
+      Serial.println("]");
+      Serial.println(sizeof(embeddings_arr));
+
+      //save embeddings to an array
+      // double **input_data = new double*[NNmodel->batch_size];
+      // int **ground_truth = new int*[NNmodel->batch_size]
+      // for(int b = 0; b < NNmodel->batch_size; b++) {
+      //   input_data[b] = new double*[NNmodel->input_size];
+      //   ground_truth[b] = new double*[NNmodel->output_size];
+      //   for(int i = 0; i < NNmodel->input_size; i++){
+      //     input_data[b][i] = INPUT THE VALUE OF THE BTH EMBEDDING AT INDEX I;
+      //     ground_truth[b][i] = INPUT THE VALUE OF THE BTH GROUND TRUTH AT INDEX I;
+      //   }
+      // }
 
 
       //Get model weights from server
       // read weight into weights and the bias bit into bias
-      NNmodel->set_weights(); //set weight of model here by passing double**
+      // NNmodel->set_weights(); //set weight of model here by passing double**
       
       //Train FL Round
-      FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel);
+      // FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel);
 
       //update learning rate
 
-      //de-allocate the memory stored
-      for(int b = 0; b < NNmodel->batch_size; b++) {
-        delete [] input_data[b];
-        delete [] ground_truth[b];
-      }
+      // de-allocate the memory stored
+      // for(int b = 0; b < NNmodel->batch_size; b++) {
+      //   delete [] input_data[b];
+      //   delete [] ground_truth[b];
+      // }
+      delete [] embeddings_arr;
     }
 
     //Average weights
-    for(int d = 0; d < fl_devices; d++){
-      FCLayer* NNmodel = &(devices[d]);
-      for(int j = 0; j < output_size; j++){
-        for(int i = 0; i < input_size; i++){
-          weights[i][j] += NNmodel->weights[i][j]
-        }
-      }
-    }
+    // for(int d = 0; d < fl_devices; d++){
+    //   FCLayer* NNmodel = &(devices[d]);
+    //   for(int j = 0; j < output_size; j++){
+    //     for(int i = 0; i < input_size; i++){
+    //       weights[i][j] += NNmodel->weights[i][j]
+    //     }
+    //   }
+    // }
 
-    for(int j = 0; j < output_size; j++){
-      for(int i = 0; i < input_size; i++){
-        weights[i][j] = weights[i][j]/fl_devices;
-      }
-      bias[j] = bias[j]/fl_devices;
-    }
+    // for(int j = 0; j < output_size; j++){
+    //   for(int i = 0; i < input_size; i++){
+    //     weights[i][j] = weights[i][j]/fl_devices;
+    //   }
+    //   bias[j] = bias[j]/fl_devices;
+    // }
 
     //send weights to server
     

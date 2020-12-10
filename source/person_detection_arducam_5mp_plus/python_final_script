@@ -30,10 +30,14 @@ def generate_batched_data(image_data, batched_num=5):
 		for i in range(batched_num):
 			embedding, ground_truth = image_data_to_string(image_data[image_counter])
 			image_counter += 1
-			single_batch_lst[0] = single_batch_lst[0] + ';' + embedding
-			single_batch_lst[1] = single_batch_lst[1] + ';' + ground_truth
-		single_batch_lst[0] = single_batch_lst[0].encode()
-		single_batch_lst[1] = single_batch_lst[1].encode()
+			if i == 0:
+				single_batch_lst[0] = single_batch_lst[0] + embedding
+				single_batch_lst[1] = single_batch_lst[1] + ground_truth
+			else:
+				single_batch_lst[0] = single_batch_lst[0] + ';' + embedding
+				single_batch_lst[1] = single_batch_lst[1] + ';' + ground_truth
+		single_batch_lst[0] = (single_batch_lst[0] + '\n').encode()
+		single_batch_lst[1] = (single_batch_lst[1] + '\n').encode()
 		batched_data_lst.append(single_batch_lst)
 	return batched_data_lst
 
@@ -48,38 +52,43 @@ def main():
 	print(masked_batched[0])
 
 	# Setup connection to Arduino
-	port = '/dev/cu.usbmodem142101' # change this to what the Arduino Port is
-	ard = serial.Serial(port,9600,timeout=5)
+	# port = '/dev/cu.usbmodem142101' # change this to what the Arduino Port is
+	# ard = serial.Serial(port,9600,timeout=5)
 	time.sleep(5) # wait for Arduino
 
 	# For one round
 	i = 0
-	while (i < 1):
-	    # Serial write section
-	    ard.flush()
+	while (i < 0):
+		# Serial write section
+		ard.flush()
 
-	    # Get embedding and ground truth
+		# Get embedding and ground truth
 		embeddings, ground_truths = masked_batched[0]
 
 		# Send embedding
-	    ard.write(embeddings)
-	    print("Mac: sent embedding")
-	    time.sleep(2) 
+		ard.write(embeddings)
+		print("Mac: sent embedding")
+		time.sleep(2) 
 
-	    # Serial read section
-	    msg = ard.read(ard.inWaiting()) # read all characters in buffer
-	    print(f"Mac: received {msg}")
-	    # print (f"Mac: received {msg.decode('utf-8')}")
+		# Serial read section
+		msg = ard.read(ard.inWaiting()) # read all characters in buffer
+		print(f"Mac: received {msg}")
+		# print (f"Mac: received {msg.decode('utf-8')}")
 
-	    # Send ground truth
-	    ard.write(image_gt)
+		# Send ground truth
+		ard.write(image_gt)
+		time.sleep(2)
+
+		# Read Arduino's response
+		msg = ard.read(ard.inWaiting()) # read all characters in buffer
+		print(f"Mac: received {msg}")
 
 
-	    i = i + 1
+		i = i + 1
 	else:
-	    print ("Exiting")
+		print ("Exiting")
 	exit()
 
 
 if __name__ == "__main__":
-    main()
+	main()
