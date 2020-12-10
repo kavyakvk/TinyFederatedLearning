@@ -30,6 +30,14 @@ FCLayer::FCLayer (int input_sz, int output_sz,
 	int batch_size = batch;
 }
 
+void FCLayer::set_weights(double **new_weights){
+	for(int i = 0; i < input_size; ++i) {
+		for(int j = 0; i < output_size; j++){
+			weights[i][j] = new_weights[i][j];
+		}
+	}
+}
+
 double softmax(double *input_data, double *output){
 	int classes = sizeof(*output);
 	double sum = 0;
@@ -41,16 +49,6 @@ double softmax(double *input_data, double *output){
 		output[i] = output[i]/sum;
 	}
 	return output;
-}
-
-void cross_entropy(double *pred, double *real, double *result){
-	// pred and real are a [# classes] sized array 
-	int n_samples = 1;
-	int classes = sizeof(*pred)
-	
-	for(int i = 0; i < classes; i++){
-		result[i] = (pred[i]-real[i])/n_samples;
-	}
 }
 
 void dequantize(int *input_data, double *input_float){
@@ -66,7 +64,6 @@ void FCLayer::forward (double **input_float, double **output) {
 	/*
 	https://towardsdatascience.com/math-neural-network-from-scratch-in-python-d6da9f29ce65
 	*/
-	// use double output [output_size]; when calling
 
 	//self.output = np.dot(self.input, self.weights) + self.bias
 	for(int b = 0; b < batch_size; b++){
@@ -83,6 +80,28 @@ void FCLayer::forward (double **input_float, double **output) {
 	}
 }
 
+void cross_entropy_prime(double *pred, double *real, double *result, int batch_size){
+	// pred and real are a [# classes] sized array 
+	int classes = sizeof(*pred)
+	
+	for(int b = 0; b < batch_size; b++){
+		for(int i = 0; i < classes; i++){
+			result[i] = (pred[i]-real[i])/batch_size;
+		}
+	}
+}
+
+void mse_prime(double **pred, double **real, double *result, int batch_size){
+	int classes = sizeof(*pred)
+
+	for(int b = 0; b < batch_size; b++){
+		for(int i = 0; i < classes; i++){
+			result[i] = (pred[i]-real[i])/batch_size;
+		}
+	}
+
+}
+
 void FCLayer::backward (double **output, double **ground_truth, 
 						double **input_error, double** input_float,
 						double learning_rate) {
@@ -95,13 +114,13 @@ void FCLayer::backward (double **output, double **ground_truth,
 	    output_error[b] = new double[output_size];
 	}
 
+	cross_entropy_prime(output, ground_truth, output_error, batch_size);
+
 	for(int b = 0; b < batch_size; b++){
-		cross_entropy(output[b], ground_truth[b], output_error[b]);
-		
 		//input_error = np.dot(output_error, self.weights.T)
 		// batch_sizexinput_size = batch_sizexoutput_size dot output_sizexinput_size
 	    for(int i = 0; i < input_size; ++i) {
-	    	input_error[b][i] = 0;
+	    	input_error[b][i] = 0.0;
 		    for(int j = 0; i < output_size; j++){
 				input_error[b][i] += output_error[b][j]*weights[i][j];
 		    }
@@ -127,6 +146,12 @@ void FCLayer::backward (double **output, double **ground_truth,
 		}
 	}
 	//self.bias -= learning_rate * output_error
+	for(int j = 0; i < output_size; j++){
+		for(int b = 0; b < batch_size; ++i) {
+			bias[j] -= learning_rate*output_error[b][j]
+		}
+	}
+
 	for(int b = 0; b < batch_size; b++){
 	    delete [] output_error[b];
 	}
@@ -138,4 +163,40 @@ FCLayer::~FCLayer() {
 	}
 
 	delete[] bias; 
+}
+
+void FL_round(int **input_data, int **ground_truth, int local_episodes, FCLayer *model){
+
+	double **input_float = new double*[model->batch_size];
+	double **output = new double*[model->batch_size];
+	double **input_error = new double*[model->batch_size];
+
+	for(int b = 0; b < model->batch_size; ++i) {
+		input_float[b] = new double*[model->input_size];
+		output[b] = new double*[model->output_size];
+		input_error[b] = new double*[model->input_size];
+	}
+
+	for(int b = 0; b < model->batch_size; ++i) {
+		dequantize(input_data[b], input_float[b]);
+	}
+
+	for(int epi = 0; epi <= local_episodes; epi++){
+		//forward
+		model->forward(input_float, output)
+
+		//calculate and print error
+
+		//backward
+		model->backward(output, ground_truth, input_error, input_float, learning_rate);
+		
+		//update learning rate
+		//reset input_error and output in forward and backward 
+	}
+
+	for(int b = 0; b < model->batch_size; b++) {
+		delete [] input_float[b];
+		delete [] input_error[b];
+		delete [] output[b];
+	}
 }
