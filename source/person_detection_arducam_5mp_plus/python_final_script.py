@@ -59,13 +59,15 @@ def main():
 
 
 	# Setup connection to Arduino
-	# port = '/dev/cu.usbmodem142101' # change this to what the Arduino Port is
-	# ard = serial.Serial(port,9600,timeout=5)
+	port = '/dev/cu.usbmodem142101' # change this to what the Arduino Port is
+	ard = serial.Serial(port,9600,timeout=5)
 	time.sleep(5) # wait for Arduino
 
 	# For one round
 	i = 0
-	while (i < 0):
+	while (i < 1):
+		print('Beginning of a new round')
+
 		# Serial write section
 		ard.flush()
 
@@ -75,7 +77,7 @@ def main():
 		# Send embedding
 		ard.write(embeddings)
 		print("Mac: sent embeddings")
-		time.sleep(2) 
+		time.sleep(2)
 
 		# Serial read section
 		msg = ard.read(ard.inWaiting()) # read all characters in buffer
