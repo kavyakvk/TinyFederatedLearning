@@ -2,7 +2,8 @@ class FCLayer {
     int input, output;
 
   public:
-    FCLayer (int,int);
-    int forward (int input_data);
-    float backward (float output_error, float learning_rate); 
+    FCLayer (int input_size, int output_size, double quant_scale, double zero_point);
+    double forward (int input_data);
+    double backward (double output_error, double learning_rate); 
+    ~FCLayer();
 };
