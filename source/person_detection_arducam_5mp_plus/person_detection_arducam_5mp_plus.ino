@@ -28,7 +28,7 @@ limitations under the License.
 #include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow/lite/version.h"
 
-#include "NeuralNetwork.h"
+//#include "NeuralNetwork.h"
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
@@ -113,7 +113,16 @@ void setup() {
 
   static FCLayer model = new model(input_size, output_size, quant_scale, quant_zero_point, 5);
   NNmodel-->set_weights(); //set weight of model here by passing double**
-  static bool real_world = FALSE;
+  static bool real_world = FALSE; // change this if want to use Arducam
+
+  // For getting embeddings and weights
+  static byte ndx = 0;  // For keeping track where in the char array to input
+  const byte numChars = 256;
+  char readString[numChars];
+  bool endOfResponse = false; 
+  float embeddings_arr[10] = { };     // initialize all elements to 0
+  char * pch;
+  Serial.begin(9600);  // initialize serial communications at 9600 bps
 }
 
 // The name of this function is important for Arduino compatibility.
@@ -156,13 +165,54 @@ void loop() {
   } else{
     //FOR EVERY DEVICE 
     //Get embedding, save into float** input_data (batch_size x input_size) and int** ground_truth (batch_size x ouput_size)
+    readString[0] = '\0';   // reset
+    ndx = 0;
+    endOfResponse = false;
+    // Reading in embedding
+    while(!Serial.available()) {} // wait for data to arrive
+    // serial read section
+    while (Serial.available() > 0 && endOfResponse == false)
+    {
+      if (Serial.available() > 0)
+      {
+        char c = Serial.read();  //gets one byte from serial buffer
+        readString[ndx] = c; //adds to the string
+        ndx += 1;
+        if (c == '\n'){
+          endOfResponse = true;
+          Serial.println("A: Finished reading in embedding");
+        }
+      }
+    }
+
+    delay(500);
+
+    // Tokenize string and split by commas
+    Serial.println("Splitting string for embedding");
+    pch = strtok (readString, ",");
+    int embedding_index = 0;
+    while (pch != NULL){
+      embeddings_arr[embedding_index] = atof(pch);  // Store in array
+      pch = strtok (NULL, ",");   // NULL tells it to continue reading from where it left off
+      embedding_index += 1;
+    }
+
+    // Print out array
+    Serial.print("Embeddings: [");
+    for (byte i = 0; i < (sizeof(embeddings_arr)/sizeof(embeddings_arr[0])); i++){
+      Serial.print(embeddings_arr[i]);
+      Serial.print(" ");
+    }
+    Serial.println("]");
+
+    //Get model weights from server
+//    NNmodel->set_weights(); //set weight of model here by passing double**
     
     //Train FL Round
-    FL_round(input_data, ground_truth, 3, NNmodel);
+//    FL_round(input_data, ground_truth, 3, NNmodel);
 
     //Send weights to server
 
-    //Get model weights from server
-    NNmodel->set_weights(); //set weight of model here by passing double**
+    
   }
 }

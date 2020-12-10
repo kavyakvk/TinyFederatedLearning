@@ -1,0 +1,13 @@
+# Python script to run Federated Learning
+
+
+# 1. Load pickle file embeddings
+# 2. Load initial weight
+# 3. Communicate with arduino
+
+
+import pickle
+
+
+masked_embeddings = pickle.load(open('../../dl/pickle_masked_processed_color_1209.p', 'rb'))
+unmasked_embeddings = pickle.load(open('../../dl/pickle_unmasked_processed_color_1209.p', 'rb'))
