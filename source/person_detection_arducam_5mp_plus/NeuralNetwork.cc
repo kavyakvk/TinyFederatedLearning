@@ -149,7 +149,7 @@ double mse(double **pred, double **real){
 }
 
 void FCLayer::backward (double **output, double **ground_truth, 
-						double **input_error, double** input_float,
+						double **input_error, double **input_float,
 						double learning_rate) {
 	/*
 	https://towardsdatascience.com/neural-networks-from-scratch-easy-vs-hard-b26ddc2e89c7
@@ -203,7 +203,7 @@ void FCLayer::backward (double **output, double **ground_truth,
 	}
 }
 
-FCLayer::~FCLayer() { 
+FCLayer::~FCLayer(void) { 
 	for(int i = 0; i < input_size; ++i) {
 		delete [] weights[i];
 	}

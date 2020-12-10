@@ -27,6 +27,7 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow/lite/version.h"
+#include "FCLayer.h"
 
 //#include "NeuralNetwork.h"
 
@@ -36,6 +37,22 @@ tflite::ErrorReporter* error_reporter = nullptr;
 const tflite::Model* model = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
 TfLiteTensor* input = nullptr;
+static std::vector<FCLayer> devices;
+
+// What we added
+//CONSTANTS FOR FEDERATED LEARNING
+const int input_size = 256;
+const int output_size = 2;
+const double quant_scale = 0.04379776492714882;
+const int quant_zero_point = -128;
+const int fl_devices = 3;
+const int batch_size = 5;
+const int local_epochs = 3;
+const bool real_world = false; // change this if want to use Arducam
+static int current_round = 0;
+static char readEmbeddingsString[input_size * batch_size * (sizeof(double) / sizeof(char))];
+static char readTruthsString[batch_size * output_size * (sizeof(double) / sizeof(char))];
+static char readWeightsString[input_size * output_size * (sizeof(double) / sizeof(char))];
 
 // In order to use optimized tensorflow lite kernels, a signed int8 quantized
 // model is preferred over the legacy unsigned model format. This means that
@@ -50,14 +67,14 @@ constexpr int kTensorArenaSize = 135000;
 static uint8_t tensor_arena[kTensorArenaSize];
 }  // namespace
 
-//CONSTANTS FOR FEDERATED LEARNING
-const int input_size = 256;
-const int output_size = 2;
-const double quant_scale = 0.04379776492714882;
-const int quant_zero_point = -128;
-const int fl_devices = 3;
-const int batch_size = 5;
-const int local_epochs = 3;
+
+
+// For getting embeddings and weights
+static int ndx = 0;  // For keeping track where in the char array to input
+static int numChars = input_size * batch_size * (sizeof(double) / sizeof(char));
+static bool endOfResponse = false; 
+static char * pch;
+static char * pch_row;
 
 // The name of this function is important for Arduino compatibility.
 void setup() {
@@ -116,23 +133,12 @@ void setup() {
   input = interpreter->input(0);
 
   //INITIALIZE THE MODEL
-  static std::vector<FCLayer> devices;
+  
   for(int i = 0; i < fl_devices; i++)
   {
-    devices.push_back(FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, TRUE));
+    devices.push_back(FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, true));
   }
-  static bool real_world = FALSE; // change this if want to use Arducam
-  static int current_round = 0;
-
-  // For getting embeddings and weights
-  static int ndx = 0;  // For keeping track where in the char array to input
-  static int numChars = input_size * batch_size;
-  char readEmbeddingsString[numChars];
-  char readTruthsString[batch_size * output_size];
-  bool endOfResponse = false; 
-  // float embeddings_arr[] = { };     // initialize all elements to 0
-  char * pch;
-  char * pch_row;
+  
   Serial.begin(9600);  // initialize serial communications at 9600 bps
 }
 
@@ -184,7 +190,8 @@ void loop() {
 
     for(int d = 0; d < fl_devices; d++){
       FCLayer* NNmodel = &(devices[d]);
-      
+
+      // GET EMBEDDINGS
       //Get embedding, save into float** input_data (batch_size x input_size) and int** ground_truth (batch_size x ouput_size)
       readEmbeddingsString[0] = '\0';   // reset
       ndx = 0;
@@ -201,7 +208,7 @@ void loop() {
           ndx += 1;
           if (c == '\n'){
             endOfResponse = true;
-            Serial.println("A: Finished reading in embeddings");
+            Serial.println("A: Finished reading in embedding");
           }
         }
       }
@@ -215,7 +222,7 @@ void loop() {
       int embedding_index = 0;
       while (pch != NULL){
         embeddings_arr[embedding_index] = atof(pch);  // Store in array
-        pch = strtok (NULL, ",");   // NULL tells it to continue reading from where it left off
+        pch = strtok (NULL, ",;");   // NULL tells it to continue reading from where it left off
         embedding_index += 1;
       }
 
@@ -228,12 +235,13 @@ void loop() {
       Serial.println("]");
       Serial.println(sizeof(embeddings_arr));
 
-      // READ IN GROUND TRUTHS
+
+      // GET GROUND TRUTHS
       //Get int** ground_truth (batch_size x ouput_size)
       readTruthsString[0] = '\0';   // reset
       ndx = 0;
       endOfResponse = false;
-      // Reading in embedding
+      // Reading in ground truths
       while(!Serial.available()) {} // wait for data to arrive
       // serial read section
       while (Serial.available() > 0 || endOfResponse == false)
@@ -253,38 +261,82 @@ void loop() {
       delay(500);
 
       // Tokenize string and split by commas
-      Serial.println("Splitting string for ground truth");
-      double *embeddings_arr = new double[numChars];
-      pch = strtok (readEmbeddingsString, ",;");
-      int embedding_index = 0;
+      Serial.println("Splitting string for ground truths");
+      int *gt_arr = new int[batch_size * output_size];
+      pch = strtok (readTruthsString, ",;");
+      int gt_index = 0;
       while (pch != NULL){
-        embeddings_arr[embedding_index] = atof(pch);  // Store in array
-        pch = strtok (NULL, ",");   // NULL tells it to continue reading from where it left off
-        embedding_index += 1;
+        gt_arr[gt_index] = atof(pch);  // Store in array
+        pch = strtok (NULL, ",;");   // NULL tells it to continue reading from where it left off
+        gt_index += 1;
       }
 
       // Print out array
-      Serial.print("Embeddings: [");
-      for (byte i = 0; i < (sizeof(embeddings_arr)/sizeof(embeddings_arr[0])); i++){
-        Serial.print(embeddings_arr[i]);
+      Serial.print("Ground Truths: [");
+      for (byte i = 0; i < (sizeof(gt_arr)/sizeof(gt_arr[0])); i++){
+        Serial.print(gt_arr[i]);
         Serial.print(" ");
       }
       Serial.println("]");
-      Serial.println(sizeof(embeddings_arr));
+      Serial.println(sizeof(gt_arr));
 
-      //save embeddings to an array
-      // double **input_data = new double*[NNmodel->batch_size];
-      // int **ground_truth = new int*[NNmodel->batch_size]
-      // for(int b = 0; b < NNmodel->batch_size; b++) {
-      //   input_data[b] = new double*[NNmodel->input_size];
-      //   ground_truth[b] = new double*[NNmodel->output_size];
-      //   for(int i = 0; i < NNmodel->input_size; i++){
-      //     input_data[b][i] = INPUT THE VALUE OF THE BTH EMBEDDING AT INDEX I;
-      //     ground_truth[b][i] = INPUT THE VALUE OF THE BTH GROUND TRUTH AT INDEX I;
-      //   }
-      // }
+      //save embeddings and ground truths to an array
+      double **input_data = new double*[NNmodel->batch_size];
+      int **ground_truth = new int*[NNmodel->batch_size];
+      for(int b = 0; b < NNmodel->batch_size; b++) {
+        input_data[b] = new double[NNmodel->input_size];
+        ground_truth[b] = new int[NNmodel->output_size];
+        for(int i = 0; i < NNmodel->input_size; i++){
+          input_data[b][i] = embeddings_arr[b*input_size + i]; // INPUT THE VALUE OF THE BTH EMBEDDING AT INDEX I 
+        }
+        for (int j = 0; j < NNmodel->output_size; j++){
+          ground_truth[b][j] = gt_arr[b*output_size + j]; //INPUT THE VALUE OF THE BTH GROUND TRUTH AT INDEX I
+        }
+      }
 
+      // GET WEIGHTS
+      //Get double** weights ()
+//      readWeightString[0] = '\0';   // reset
+//      ndx = 0;
+//      endOfResponse = false;
+//      // Reading in weights
+//      while(!Serial.available()) {} // wait for data to arrive
+//      // serial read section
+//      while (Serial.available() > 0 || endOfResponse == false)
+//      {
+//        if (Serial.available() > 0)
+//        {
+//          char c = Serial.read();  //gets one byte from serial buffer
+//          readWeightString[ndx] = c; //adds to the string
+//          ndx += 1;
+//          if (c == '\n'){
+//            endOfResponse = true;
+//            Serial.println("A: Finished reading in weights");
+//          }
+//        }
+//      }
+//
+//      delay(500);
+//
+//      // Tokenize string and split by commas
+//      Serial.println("Splitting string for ground truths");
+//      double *weight_arr = new int[batch_size * output_size];
+//      pch = strtok (readTruthsString, ",;");
+//      int gt_index = 0;
+//      while (pch != NULL){
+//        gt_arr[gt_index] = atof(pch);  // Store in array
+//        pch = strtok (NULL, ",;");   // NULL tells it to continue reading from where it left off
+//        gt_index += 1;
+//      }
 
+      // Print out array
+      Serial.print("Ground Truths: [");
+      for (byte i = 0; i < (sizeof(gt_arr)/sizeof(gt_arr[0])); i++){
+        Serial.print(gt_arr[i]);
+        Serial.print(" ");
+      }
+      Serial.println("]");
+      Serial.println(sizeof(gt_arr));
       //Get model weights from server
       // read weight into weights and the bias bit into bias
       // NNmodel->set_weights(); //set weight of model here by passing double**
@@ -295,11 +347,12 @@ void loop() {
       //update learning rate
 
       // de-allocate the memory stored
-      // for(int b = 0; b < NNmodel->batch_size; b++) {
-      //   delete [] input_data[b];
-      //   delete [] ground_truth[b];
-      // }
+      for(int b = 0; b < batch_size; b++) {
+        delete [] input_data[b];
+        delete [] ground_truth[b];
+      }
       delete [] embeddings_arr;
+      delete [] gt_arr;
     }
 
     //Average weights
