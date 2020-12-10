@@ -28,6 +28,8 @@ limitations under the License.
 #include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow/lite/version.h"
 
+#include "NeuralNetwork.h"
+
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
 tflite::ErrorReporter* error_reporter = nullptr;
@@ -47,6 +49,11 @@ TfLiteTensor* input = nullptr;
 constexpr int kTensorArenaSize = 135000;
 static uint8_t tensor_arena[kTensorArenaSize];
 }  // namespace
+
+const int input_size = 256;
+const int output_size = 2;
+const double quant_scale = 0.04379776492714882;
+const int quant_zero_point = -128;
 
 // The name of this function is important for Arduino compatibility.
 void setup() {
@@ -103,43 +110,59 @@ void setup() {
 
   // Get information about the memory area to use for the model's input.
   input = interpreter->input(0);
+
+  static FCLayer model = new model(input_size, output_size, quant_scale, quant_zero_point, 5);
+  NNmodel-->set_weights(); //set weight of model here by passing double**
+  static bool real_world = FALSE;
 }
 
 // The name of this function is important for Arduino compatibility.
 void loop() {
-  // Get image from provider.
-  if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels,
-                            input->data.int8)) {
-    TF_LITE_REPORT_ERROR(error_reporter, "Image capture failed.");
+  if(real_world){
+    // Get image from provider.
+    if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels,
+                              input->data.int8)) {
+      TF_LITE_REPORT_ERROR(error_reporter, "Image capture failed.");
+    }
+
+    Serial.println("captured image finished.");
+    Serial.println("inference starting.");
+
+    // Run the model on this input and make sure it succeeds.
+    if (kTfLiteOk != interpreter->Invoke()) {
+      TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
+    }
+
+    Serial.println("inference finished.");
+
+    // Get the embedding from the feature extractor
+    TfLiteTensor* output = interpreter->output(0);
+
+    //  TF_LITE_REPORT_ERROR(error_reporter,"Char array: %d", output->data.uint8);
+
+    RespondToDetection(error_reporter, 10, -10);
+
+    // Process the inference results.
+    // Embedding
+    int8_t person_score = output->data.uint8[kPersonIndex];
+    int8_t no_person_score = output->data.uint8[kNotAPersonIndex];
+    for(int i = 0; i < 256; i++){
+      Serial.print(output->data.uint8[i]);
+      Serial.print(" ");
+    }
+    Serial.println();
+    //  RespondToDetection(error_reporter, person_score, no_person_score);
+
+  } else{
+    //FOR EVERY DEVICE 
+    //Get embedding, save into float** input_data (batch_size x input_size) and int** ground_truth (batch_size x ouput_size)
+    
+    //Train FL Round
+    FL_round(input_data, ground_truth, 3, NNmodel);
+
+    //Send weights to server
+
+    //Get model weights from server
+    NNmodel->set_weights(); //set weight of model here by passing double**
   }
-
-  Serial.println("captured image finished.");
-  Serial.println("inference starting.");
-
-  // Run the model on this input and make sure it succeeds.
-  if (kTfLiteOk != interpreter->Invoke()) {
-    TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
-  }
-
-  Serial.println("inference finished.");
-
-  // Get the embedding from the feature extractor
-  TfLiteTensor* output = interpreter->output(0);
-
-//  TF_LITE_REPORT_ERROR(error_reporter,"Char array: %d", output->data.uint8);
-
-  RespondToDetection(error_reporter, 10, -10);
-
-  // Process the inference results.
-
-  // Embedding
-  int8_t person_score = output->data.uint8[kPersonIndex];
-  int8_t no_person_score = output->data.uint8[kNotAPersonIndex];
-  for(int i = 0; i < 256; i++){
-    Serial.print(output->data.uint8[i]);
-    Serial.print(" ");
-  }
-  Serial.println();
-//  RespondToDetection(error_reporter, person_score, no_person_score);
-  
 }
