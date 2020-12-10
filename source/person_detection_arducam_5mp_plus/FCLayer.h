@@ -11,7 +11,7 @@ class FCLayer {
         FCLayer (int input_size, int output_size, double quant_scale, 
         			int zero_point, int batch, bool default_weight);
         void forward (double **input_float, double **output);
-        void backward (double **output, double **ground_truth, 
+        void backward (double **output, int **ground_truth, 
     						double **input_error, double **input_float,
     						double learning_rate); 
         void dequantize(int *input_data, double *input_float);
