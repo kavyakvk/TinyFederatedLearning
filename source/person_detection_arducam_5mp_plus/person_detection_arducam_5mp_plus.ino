@@ -50,10 +50,14 @@ constexpr int kTensorArenaSize = 135000;
 static uint8_t tensor_arena[kTensorArenaSize];
 }  // namespace
 
+//CONSTANTS FOR FEDERATED LEARNING
 const int input_size = 256;
 const int output_size = 2;
 const double quant_scale = 0.04379776492714882;
 const int quant_zero_point = -128;
+const int fl_devices = 3;
+const int batch_size = 5;
+const int local_epochs = 3;
 
 // The name of this function is important for Arduino compatibility.
 void setup() {
@@ -111,9 +115,14 @@ void setup() {
   // Get information about the memory area to use for the model's input.
   input = interpreter->input(0);
 
-  static FCLayer model = new model(input_size, output_size, quant_scale, quant_zero_point, 5);
-  NNmodel-->set_weights(); //set weight of model here by passing double**
+  //INITIALIZE THE MODEL
+  static std::vector<FCLayer> devices;
+  for(int i = 0; i < fl_devices; i++)
+  {
+    devices.push_back(FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, TRUE));
+  }
   static bool real_world = FALSE; // change this if want to use Arducam
+  static int current_round = 0;
 
   // For getting embeddings and weights
   static byte ndx = 0;  // For keeping track where in the char array to input
@@ -153,8 +162,8 @@ void loop() {
 
     // Process the inference results.
     // Embedding
-    int8_t person_score = output->data.uint8[kPersonIndex];
-    int8_t no_person_score = output->data.uint8[kNotAPersonIndex];
+    //int8_t person_score = output->data.uint8[kPersonIndex];
+    //int8_t no_person_score = output->data.uint8[kNotAPersonIndex];
     for(int i = 0; i < 256; i++){
       Serial.print(output->data.uint8[i]);
       Serial.print(" ");
@@ -163,56 +172,105 @@ void loop() {
     //  RespondToDetection(error_reporter, person_score, no_person_score);
 
   } else{
+    current_round += 1;
+    
     //FOR EVERY DEVICE 
-    //Get embedding, save into float** input_data (batch_size x input_size) and int** ground_truth (batch_size x ouput_size)
-    readString[0] = '\0';   // reset
-    ndx = 0;
-    endOfResponse = false;
-    // Reading in embedding
-    while(!Serial.available()) {} // wait for data to arrive
-    // serial read section
-    while (Serial.available() > 0 && endOfResponse == false)
-    {
-      if (Serial.available() > 0)
+    int epochs = 3;
+
+    float weights[input_size][output_size];
+    float bias[output_size];
+
+    for(int d = 0; d < fl_devices; d++){
+      FCLayer* NNmodel = &(devices[d]);
+      
+      //Get embedding, save into float** input_data (batch_size x input_size) and int** ground_truth (batch_size x ouput_size)
+      readString[0] = '\0';   // reset
+      ndx = 0;
+      endOfResponse = false;
+      // Reading in embedding
+      while(!Serial.available()) {} // wait for data to arrive
+      // serial read section
+      while (Serial.available() > 0 && endOfResponse == false)
       {
-        char c = Serial.read();  //gets one byte from serial buffer
-        readString[ndx] = c; //adds to the string
-        ndx += 1;
-        if (c == '\n'){
-          endOfResponse = true;
-          Serial.println("A: Finished reading in embedding");
+        if (Serial.available() > 0)
+        {
+          char c = Serial.read();  //gets one byte from serial buffer
+          readString[ndx] = c; //adds to the string
+          ndx += 1;
+          if (c == '\n'){
+            endOfResponse = true;
+            Serial.println("A: Finished reading in embedding");
+          }
+        }
+      }
+
+      delay(500);
+
+      // Tokenize string and split by commas
+      Serial.println("Splitting string for embedding");
+      pch = strtok (readString, ",");
+      int embedding_index = 0;
+      while (pch != NULL){
+        embeddings_arr[embedding_index] = atof(pch);  // Store in array
+        pch = strtok (NULL, ",");   // NULL tells it to continue reading from where it left off
+        embedding_index += 1;
+      }
+
+      // Print out array
+      Serial.print("Embeddings: [");
+      for (byte i = 0; i < (sizeof(embeddings_arr)/sizeof(embeddings_arr[0])); i++){
+        Serial.print(embeddings_arr[i]);
+        Serial.print(" ");
+      }
+      Serial.println("]");
+
+      //save embeddings to an array
+      double **input_data = new double*[NNmodel->batch_size];
+      int **ground_truth = new int*[NNmodel->batch_size]
+      for(int b = 0; b < NNmodel->batch_size; b++) {
+        input_data[b] = new double*[NNmodel->input_size];
+        ground_truth[b] = new double*[NNmodel->output_size];
+        for(int i = 0; i < NNmodel->input_size; i++){
+          input_data[b][i] = INPUT THE VALUE OF THE BTH EMBEDDING AT INDEX I;
+          ground_truth[b][i] = INPUT THE VALUE OF THE BTH GROUND TRUTH AT INDEX I;
+        }
+      }
+
+
+      //Get model weights from server
+      // read weight into weights and the bias bit into bias
+      NNmodel->set_weights(); //set weight of model here by passing double**
+      
+      //Train FL Round
+      FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel);
+
+      //update learning rate
+
+      //de-allocate the memory stored
+      for(int b = 0; b < NNmodel->batch_size; b++) {
+        delete [] input_data[b];
+        delete [] ground_truth[b];
+      }
+    }
+
+    //Average weights
+    for(int d = 0; d < fl_devices; d++){
+      FCLayer* NNmodel = &(devices[d]);
+      for(int j = 0; j < output_size; j++){
+        for(int i = 0; i < input_size; i++){
+          weights[i][j] += NNmodel->weights[i][j]
         }
       }
     }
 
-    delay(500);
-
-    // Tokenize string and split by commas
-    Serial.println("Splitting string for embedding");
-    pch = strtok (readString, ",");
-    int embedding_index = 0;
-    while (pch != NULL){
-      embeddings_arr[embedding_index] = atof(pch);  // Store in array
-      pch = strtok (NULL, ",");   // NULL tells it to continue reading from where it left off
-      embedding_index += 1;
+    for(int j = 0; j < output_size; j++){
+      for(int i = 0; i < input_size; i++){
+        weights[i][j] = weights[i][j]/fl_devices;
+      }
+      bias[j] = bias[j]/fl_devices;
     }
 
-    // Print out array
-    Serial.print("Embeddings: [");
-    for (byte i = 0; i < (sizeof(embeddings_arr)/sizeof(embeddings_arr[0])); i++){
-      Serial.print(embeddings_arr[i]);
-      Serial.print(" ");
-    }
-    Serial.println("]");
-
-    //Get model weights from server
-//    NNmodel->set_weights(); //set weight of model here by passing double**
-    
-    //Train FL Round
-//    FL_round(input_data, ground_truth, 3, NNmodel);
-
-    //Send weights to server
-
+    //send weights to server
     
   }
 }

@@ -4,7 +4,7 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include <math.h>		/* exp */
-#include "NeuralNetwork.h" 
+#include "FCLayer.h" 
 using namespace std;
 
 //TODO: PUT THIS SOMEWHERE srand (time(NULL));
@@ -216,13 +216,13 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 	double **output = new double*[model->batch_size];
 	double **input_error = new double*[model->batch_size];
 
-	for(int b = 0; b < model->batch_size; ++i) {
+	for(int b = 0; b < model->batch_size; b++) {
 		input_float[b] = new double*[model->input_size];
 		output[b] = new double*[model->output_size];
 		input_error[b] = new double*[model->input_size];
 	}
 
-	for(int b = 0; b < model->batch_size; ++i) {
+	for(int b = 0; b < model->batch_size; b++) {
 		model->dequantize(input_data[b], input_float[b]);
 	}
 
@@ -230,7 +230,7 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		//forward
 		model->forward(input_float, output);
 
-		for(int b = 0; b < model->batch_size; ++i) {
+		for(int b = 0; b < model->batch_size; b++) {
 			//softmax to get probabilities
 			softmax(output[b], output_size, output[b]);
 		}
@@ -241,7 +241,6 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		//backward
 		model->backward(output, ground_truth, input_error, input_float, learning_rate);
 		
-		//update learning rate
 		//reset input_error and output in forward and backward 
 	}
 
@@ -251,28 +250,28 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 	}
 }
 
-void FL_round_quantize(int **input_data, int **ground_truth, int local_episodes, 
+void FL_round_quantize(int **input_data, int **ground_truth, int local_epochs, 
 				double learning_rate, FCLayer *model){
 
 	double **input_float = new double*[model->batch_size];
 	double **output = new double*[model->batch_size];
 	double **input_error = new double*[model->batch_size];
 
-	for(int b = 0; b < model->batch_size; ++i) {
+	for(int b = 0; b < model->batch_size; b++) {
 		input_float[b] = new double*[model->input_size];
 		output[b] = new double*[model->output_size];
 		input_error[b] = new double*[model->input_size];
 	}
 
-	for(int b = 0; b < model->batch_size; ++i) {
+	for(int b = 0; b < model->batch_size; b++) {
 		model->dequantize(input_data[b], input_float[b]);
 	}
 
-	for(int epi = 0; epi <= local_episodes; epi++){
+	for(int epi = 0; epi <= local_epochs; epi++){
 		//forward
 		model->forward(input_float, output);
 
-		for(int b = 0; b < model->batch_size; ++i) {
+		for(int b = 0; b < model->batch_size; b++) {
 			//softmax to get probabilities
 			softmax(output[b], output_size, output[b]);
 		}
@@ -283,7 +282,6 @@ void FL_round_quantize(int **input_data, int **ground_truth, int local_episodes,
 		//backward
 		model->backward(output, ground_truth, input_error, input_float, learning_rate);
 		
-		//update learning rate
 		//reset input_error and output in forward and backward 
 	}
 
