@@ -48,7 +48,7 @@ ActivationLayer::~ActivationLayer() {
 	}
 }
 */
-
+const double initial_model_bias[] = {0.08060145, -0.08060154};
 const double initial_model_weights[] = {
 		0.07168999,  0.07093393,  0.14018372,  0.14018327,  0.05810054,
         0.05802297, -0.07410979, -0.0738539 , -0.01224348, -0.01215865,
@@ -155,15 +155,29 @@ const double initial_model_weights[] = {
        -0.01126344, -0.01120145
    };
 
+FCLayer::FCLayer (){
+	//bias = new double[1];
+	//input_size = 0;
+	//output_size = 0;
+}
+
 FCLayer::FCLayer (int input_sz, int output_sz, 
-					double quant_scale, int quant_zero_point,
+					double scale, int zero_point,
 					int batch, bool default_weight) {
 	input_size = input_sz;
 	output_size = output_sz;
 
+	cout << "set input size to: " << input_size << "\n";
+	cout << "set output size to: " << output_size << "\n";
+
 	bias = new double[output_size];
-	for(int i = 0; i < output_size; i++) {
-		bias[i] = (double)rand()/(RAND_MAX);
+	for(int j = 0; j < output_size; j++) {
+		if(default_weight){
+			bias[j] = initial_model_bias[j];
+		}
+		else{
+			bias[j] = (double)rand()/(RAND_MAX);
+		}
 	}
 
 	weights = new double*[input_size];
@@ -180,24 +194,26 @@ FCLayer::FCLayer (int input_sz, int output_sz,
 			
 	    }
 	}
-	int batch_size = batch;
+	batch_size = batch;
+	quant_zero_point = zero_point;
+	quant_scale = scale;
 }
 
+/*
 void FCLayer::set_weights(double **new_weights){
 	for(int i = 0; i < input_size; ++i) {
 		std::memcpy(weights, new_weights, sizeof(double)*output_size);
 	}
 }
-
-void softmax(double *input_data, double *output){
-	int classes = sizeof(*output);
+*/
+void softmax(double *input_output_data, int classes){
 	double sum = 0;
 	for(int i = 0; i < classes; i++){
-		output[i] = exp(input_data[i]);
-		sum += output[i];
+		input_output_data[i] = exp(input_output_data[i]);
+		sum += input_output_data[i];
 	}
 	for(int i = 0; i < classes; i++){
-		output[i] = output[i]/sum;
+		input_output_data[i] = input_output_data[i]/sum;
 	}
 }
 
@@ -227,29 +243,26 @@ void FCLayer::forward (double **input_float, double **output) {
 	}
 }
 
-void cross_entropy_prime(double *pred, double *real, double *result){
+void cross_entropy_prime(double *pred, double *real, double *result, int classes){
 	// pred and real are a [# classes] sized array 
-	int classes = sizeof(*pred);
 	for(int i = 0; i < classes; i++){
 		result[i] += (pred[i]-real[i]);
 	}
 }
 
-void mse_prime(double *pred, int *real, double *result){
-	int classes = sizeof(*pred);
+void mse_prime(double *pred, int *real, double *result, int classes){
 	for(int i = 0; i < classes; i++){
 		result[i] += 2*(pred[i]-real[i]);
 	}
+
 }
 
-double mse(double **pred, int **real){
+double mse(double **pred, int **real, int batch_size, int classes){
 	double result = 0.0;
-	int batch_size = sizeof(*pred);
-	int classes = sizeof(*pred[0]);
 
 	for(int b = 0; b < batch_size; b++){
-		for(int i = 0; i < classes; i++){
-			result += pow((pred[b][i]-real[b][i]), 2);
+		for(int j = 0; j < classes; j++){
+			result += pow((pred[b][j]-real[b][j]), 2);
 		}
 	}
 	return result/(classes*batch_size);
@@ -265,7 +278,7 @@ void FCLayer::backward (double **output, int **ground_truth,
 	double **output_error = new double*[batch_size];
 	for(int b = 0; b < batch_size; b++) {
 	    output_error[b] = new double[output_size];
-	    mse_prime(output[b], ground_truth[b], output_error[b]);
+	    mse_prime(output[b], ground_truth[b], output_error[b], output_size);
 	}
 
 	for(int b = 0; b < batch_size; b++){
@@ -315,69 +328,92 @@ void FCLayer::backward (double **output, int **ground_truth,
 	}
 }
 
-FCLayer::~FCLayer(void) { 
+void FCLayer::cleanup(){
+	cout << weights[0][0] << "\n";
 	for(int i = 0; i < input_size; i++) {
 		delete [] weights[i];
 	}
+	delete[] weights;
+	delete[] bias;
+}
 
-	delete[] bias; 
+FCLayer::~FCLayer() { 
+	 
 }
 
 void FL_round_simulation(double **input_float, int **ground_truth, int local_episodes, 
 						double learning_rate, FCLayer *model, bool verbose){
+	
+	cout << "inside called sim \n";
+	if(verbose == true){
+		cout << "\tstarted sim\n";
+	}
 	double **output = new double*[model->batch_size];
 	double **input_error = new double*[model->batch_size];
 
-	if(verbose){
-		cout << "\tallocated";
+	if(verbose == true){
+		cout << "\tallocated\n";
 	}
 
 	for(int b = 0; b < model->batch_size; b++) {
-		input_float[b] = new double[model->input_size];
 		output[b] = new double[model->output_size];
+		for(int j = 0; j < model->output_size; j++){
+			output[b][j] = 0.0;
+		}
+
 		input_error[b] = new double[model->input_size];
+		for(int i = 0; i < model->input_size; i++){
+			input_error[b][i] = 0.0;
+		}
 	}
 
-	if(verbose){
-		cout << "\tallocated part 2";
+	if(verbose == true){
+		cout << "\tallocated part 2\n";
+		cout << "\tinitial bias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
+		cout << "\tinitial output " << output[0][0] << " " << output[0][1] << "\n";
 	}
 
 	for(int epi = 0; epi <= local_episodes; epi++){
+		if(verbose == true){
+			cout << "EPISODE " << epi << "\n";
+		}
 		//forward
 		model->forward(input_float, output);
 
-		if(verbose){
-			cout << "\tforward";
+		if(verbose == true){
+			cout << "\tforward\n";
+			cout << "\t\tbias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
+			cout << "\t\toutput " << output[0][0] << " " << output[0][1] << "\n";
 		}
 
 		for(int b = 0; b < model->batch_size; b++) {
 			//softmax to get probabilities
-			softmax(output[b], output[b]);
+			softmax(output[b], model->output_size);
 		}
 
-		if(verbose){
-			cout << "\tsoftmax";
+		if(verbose == true){
+			cout << "\tsoftmax " << output[0][0] << " " << output[0][1] << "\n";
 		}
 
 		//calculate and print error
-		double error = mse(output, ground_truth);
+		double error = mse(output, ground_truth, model->batch_size, model->output_size);
 
-		if(verbose){
-			cout << "\terror, " << error << " !";
+		if(verbose == true){
+			cout << "\terror, " << error << "\n";
 		}
 
 		//backward
 		model->backward(output, ground_truth, input_error, input_float, learning_rate);
 
-		if(verbose){
-			cout << "\tbackward";
+		if(verbose == true){
+			cout << "\tbackward\n";
 		}
 		
 		//reset input_error and output in forward and backward 
 	}
 
-	if(verbose){
-			cout << "\tdone loop";
+	if(verbose == true){
+			cout << "\tdone loop\n";
 	}
 
 	for(int b = 0; b < model->batch_size; b++) {
@@ -385,8 +421,8 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		delete [] output[b];
 	}
 
-	if(verbose){
-			cout << "\tdone de-allocation";
+	if(verbose == true){
+			cout << "\tdone de-allocation\n";
 	}
 }
 
@@ -413,11 +449,11 @@ void FL_round_quantize(int **input_data, int **ground_truth, int local_epochs,
 
 		for(int b = 0; b < model->batch_size; b++) {
 			//softmax to get probabilities
-			softmax(output[b], output[b]);
+			softmax(output[b], model->output_size);
 		}
 
 		//calculate and print error
-		double error = mse(output, ground_truth);
+		double error = mse(output, ground_truth, model->batch_size, model->output_size);
 
 		//backward
 		model->backward(output, ground_truth, input_error, input_float, learning_rate);
