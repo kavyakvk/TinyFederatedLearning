@@ -73,7 +73,7 @@ static uint8_t tensor_arena[kTensorArenaSize];
 
 // For getting embeddings and weights
 static int ndx = 0;  // For keeping track where in the char array to input
-static int numChars = input_size * batch_size;
+static int numChars = input_size * batch_size * (sizeof(double) / sizeof(char));
 static bool endOfResponse = false; 
 static char * pch;
 static char * pch_row;
@@ -190,198 +190,170 @@ void loop() {
     float weights[input_size][output_size];
     float bias[output_size];
 
-    Serial.print("creating devices \n");
+    for(int d = 0; d < fl_devices; d++){
+      FCLayer* NNmodel = &(devices[d]);
 
-    //FCLayer hi = FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, true);
+      // GET EMBEDDINGS
+      //Get embedding, save into float** input_data (batch_size x input_size) and int** ground_truth (batch_size x ouput_size)
+      readEmbeddingsString[0] = '\0';   // reset
+      ndx = 0;
+      endOfResponse = false;
+      // Reading in embedding
+      while(!Serial.available()) {} // wait for data to arrive
+      // serial read section
+      while (Serial.available() > 0 || endOfResponse == false)
+      {
+        if (Serial.available() > 0)
+        {
+          char c = Serial.read();  //gets one byte from serial buffer
+          readEmbeddingsString[ndx] = c; //adds to the string
+          ndx += 1;
+          if (c == '\n'){
+            endOfResponse = true;
+            Serial.println("A: Finished reading in embedding");
+          }
+        }
+      }
 
-    FCLayer devices[fl_devices];
+      delay(500);
 
-    for(int i = 0; i < fl_devices; i++){
-      devices[i] = FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, true);
-    
-      FCLayer* NNmodel = &(devices[i]);
-
-      // // GET EMBEDDINGS
-      // //Get embedding, save into float** input_data (batch_size x input_size) and int** ground_truth (batch_size x ouput_size)
-      // readEmbeddingsString[0] = '\0';   // reset
-      // ndx = 0;
-      // endOfResponse = false;
-      // // Reading in embedding
-      // while(!Serial.available()) {delay(500);} // wait for data to arrive
-      // // serial read section
-      // while (Serial.available() > 0 || endOfResponse == false)
-      // {
-      //   if (Serial.available() > 0)
-      //   {
-      //     char c = Serial.read();  //gets one byte from serial buffer
-      //     readEmbeddingsString[ndx] = c; //adds to the string
-      //     ndx += 1;
-      //     if (c == '\n'){
-      //       endOfResponse = true;
-      //       Serial.println("A: Finished reading in embedding");
-      //     }
-      //   }
-      // }
-
-      // delay(500);
-
-      // // Tokenize string and split by commas
-      // Serial.println("Splitting string for embedding");
-      // double embeddings_arr[numChars];
-      // pch = strtok (readEmbeddingsString, ",;");
-      // int embedding_index = 0;
-      // while (pch != NULL){
-      //   embeddings_arr[embedding_index] = atof(pch);  // Store in array
-      //   pch = strtok (NULL, ",;");   // NULL tells it to continue reading from where it left off
-      //   embedding_index += 1;
-      // }
-      // Alternatively
-      // for(int b = 0; i < NNmodel->batch_size; b++){
-      //   for(int j = 0; j < NNmodel->input_size; j++){
-      //     if(i == 0 & j == 0){
-      //       pch = strtok (readWeightsString, ",;");
-      //     }
-      //     else{
-      //       pch = strtok (NULL, ",;");
-      //     }
-      //     input_data[b][j] = atof(pch);
-      //   }
-      // }
-
-      //save embeddings and ground truths to an array
-      Serial.print("Splitting string for embedding\n");
-
-      double embeddings_arr[batch_size*input_size];
+      // Tokenize string and split by commas
+      Serial.println("Splitting string for embedding");
+      double embeddings_arr[numChars];
+      pch = strtok (readEmbeddingsString, ",;");
       int embedding_index = 0;
-      for(int i = 0; i < batch_size*input_size; i++){
-        embeddings_arr[embedding_index] = 1.1;//(double)rand()/(RAND_MAX);
+      while (pch != NULL){
+        embeddings_arr[embedding_index] = atof(pch);  // Store in array
+        pch = strtok (NULL, ",;");   // NULL tells it to continue reading from where it left off
         embedding_index += 1;
       }
 
-      Serial.print("finished Splitting string for embedding\n");
-
-      // // GET GROUND TRUTHS
-      // //Get int** ground_truth (batch_size x ouput_size)
-      // readTruthsString[0] = '\0';   // reset
-      // ndx = 0;
-      // endOfResponse = false;
-      // // Reading in ground truths
-      // while(!Serial.available()) {delay(500);} // wait for data to arrive
-      // // serial read section
-      // while (Serial.available() > 0 || endOfResponse == false)
-      // {
-      //   if (Serial.available() > 0)
-      //   {
-      //     char c = Serial.read();  //gets one byte from serial buffer
-      //     readTruthsString[ndx] = c; //adds to the string
-      //     ndx += 1;
-      //     if (c == '\n'){
-      //       endOfResponse = true;
-      //       Serial.println("A: Finished reading in ground truths");
-      //     }
-      //   }
-      // }
-
-      // delay(500);
-
-      // // Tokenize string and split by commas
-      // Serial.println("Splitting string for ground truths");
-      // int gt_arr[batch_size * output_size];
-      // pch = strtok (readTruthsString, ",;");
-      // int gt_index = 0;
-      // while (pch != NULL){
-      //   gt_arr[gt_index] = atoi(pch);  // Store in array
-      //   pch = strtok (NULL, ",;");   // NULL tells it to continue reading from where it left off
-      //   gt_index += 1;
-      // }
-      // Alternatively
-      // for(int b = 0; i < NNmodel->batch_size; b++){
-      //   for(int j = 0; j < NNmodel->output_size; j++){
-      //     if(i == 0 & j == 0){
-      //       pch = strtok (readTruthsString, ",;");
-      //     }
-      //     else{
-      //       pch = strtok (NULL, ",;");
-      //     }
-      //     ground_truth[b][j] = atoi(pch);
-      //   }
-      // }
-
-      Serial.print("Splitting string for gt\n");
-      int gt_arr[batch_size * output_size];
-      for(int i = 0; i < output_size*batch_size; i++){
-          gt_arr[i] = 5;
+      // Print out array
+      Serial.print("Embeddings: [");
+      for (byte i = 0; i < (sizeof(embeddings_arr)/sizeof(embeddings_arr[0])); i++){
+        Serial.print(embeddings_arr[i]);
+        Serial.print(" ");
       }
-      
-      Serial.print("finished Splitting string for gt\n");
+      Serial.println("]");
+      Serial.println(sizeof(embeddings_arr));
 
+
+      // GET GROUND TRUTHS
+      //Get int** ground_truth (batch_size x ouput_size)
+      readTruthsString[0] = '\0';   // reset
+      ndx = 0;
+      endOfResponse = false;
+      // Reading in ground truths
+      while(!Serial.available()) {} // wait for data to arrive
+      // serial read section
+      while (Serial.available() > 0 || endOfResponse == false)
+      {
+        if (Serial.available() > 0)
+        {
+          char c = Serial.read();  //gets one byte from serial buffer
+          readTruthsString[ndx] = c; //adds to the string
+          ndx += 1;
+          if (c == '\n'){
+            endOfResponse = true;
+            Serial.println("A: Finished reading in ground truths");
+          }
+        }
+      }
+
+      delay(500);
+
+      // Tokenize string and split by commas
+      Serial.println("Splitting string for ground truths");
+      int gt_arr[batch_size * output_size];
+      pch = strtok (readTruthsString, ",;");
+      int gt_index = 0;
+      while (pch != NULL){
+        gt_arr[gt_index] = atof(pch);  // Store in array
+        pch = strtok (NULL, ",;");   // NULL tells it to continue reading from where it left off
+        gt_index += 1;
+      }
+
+      // Print out array
+      Serial.print("Ground Truths: [");
+      for (byte i = 0; i < (sizeof(gt_arr)/sizeof(gt_arr[0])); i++){
+        Serial.print(gt_arr[i]);
+        Serial.print(" ");
+      }
+      Serial.println("]");
+      Serial.println(sizeof(gt_arr));
+
+      //save embeddings and ground truths to an array
       double **input_data = new double*[NNmodel->batch_size];
       int **ground_truth = new int*[NNmodel->batch_size];
-      Serial.print("finished allocating input_data and ground_truth \n");
       for(int b = 0; b < NNmodel->batch_size; b++) {
         input_data[b] = new double[NNmodel->input_size];
         ground_truth[b] = new int[NNmodel->output_size];
-        Serial.print("finished allocating actual arrays for input_data and ground_truth \n");
         for(int i = 0; i < NNmodel->input_size; i++){
-          input_data[b][i] = embeddings_arr[b*input_size + i];
+          input_data[b][i] = embeddings_arr[b*input_size + i]; // INPUT THE VALUE OF THE BTH EMBEDDING AT INDEX I 
         }
         for (int j = 0; j < NNmodel->output_size; j++){
-          ground_truth[b][j] = gt_arr[b*output_size + j];
+          ground_truth[b][j] = gt_arr[b*output_size + j]; //INPUT THE VALUE OF THE BTH GROUND TRUTH AT INDEX I
         }
       }
 
+      // GET WEIGHTS
+      //Get double** weights ()
+//      readWeightString[0] = '\0';   // reset
+//      ndx = 0;
+//      endOfResponse = false;
+//      // Reading in weights
+//      while(!Serial.available()) {} // wait for data to arrive
+//      // serial read section
+//      while (Serial.available() > 0 || endOfResponse == false)
+//      {
+//        if (Serial.available() > 0)
+//        {
+//          char c = Serial.read();  //gets one byte from serial buffer
+//          readWeightString[ndx] = c; //adds to the string
+//          ndx += 1;
+//          if (c == '\n'){
+//            endOfResponse = true;
+//            Serial.println("A: Finished reading in weights");
+//          }
+//        }
+//      }
+//
+//      delay(500);
+//
+//      // Tokenize string and split by commas
+//      Serial.println("Splitting string for ground truths");
+//      double *weight_arr = new int[batch_size * output_size];
+//      pch = strtok (readTruthsString, ",;");
+//      int gt_index = 0;
+//      while (pch != NULL){
+//        gt_arr[gt_index] = atof(pch);  // Store in array
+//        pch = strtok (NULL, ",;");   // NULL tells it to continue reading from where it left off
+//        gt_index += 1;
+//      }
 
-      // // GET WEIGHTS double** (input_size x output_size x)
-      // readWeightsString = '\0';     // reset
-      // ndx = 0;
-      // endOfResponse = false;
-      // while(!Serial.available()) {delay(500);} // wait for data to arrive
-      // // serial read section
-      // while (Serial.available() > 0 || endOfResponse == false)
-      // {
-      //   if (Serial.available() > 0)
-      //   {
-      //     char c = Serial.read();  //gets one byte from serial buffer
-      //     readWeightsString[ndx] = c; //adds to the string
-      //     ndx += 1;
-      //     if (c == '\n'){
-      //       endOfResponse = true;
-      //       Serial.println("A: Finished reading in weights");
-      //     }
-      //   }
-      // }
-      // delay(500);
-      // // Tokenize string and split by commas
-      // Serial.println("Splitting string for weights");
-      // double **init_weights = new double*[NNmodel->input_size];
-      // for(int i = 0; i < NNmodel->input_size; i++){
-      //   for(int j = 0; j < NNmodel->output_size; j++){
-      //     if(i == 0 & j == 0){
-      //       pch = strtok (readWeightsString, ",;");
-      //     }
-      //     else{
-      //       pch = strtok (NULL, ",;");
-      //     }
-      //     init_weights[i][j] = atof(pch);
-      //   }
-      // }
+      // Print out array
+      Serial.print("Ground Truths: [");
+      for (byte i = 0; i < (sizeof(gt_arr)/sizeof(gt_arr[0])); i++){
+        Serial.print(gt_arr[i]);
+        Serial.print(" ");
+      }
+      Serial.println("]");
+      Serial.println(sizeof(gt_arr));
+      //Get model weights from server
+      // read weight into weights and the bias bit into bias
+      // NNmodel->set_weights(); //set weight of model here by passing double**
+      
+      //Train FL Round
+      // FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel);
 
+      //update learning rate
 
-
-
-      Serial.print("finished loading data into input data and ground truth");
-
-      FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel, true);
-
-      NNmodel->cleanup();
-
+      // de-allocate the memory stored
       for(int b = 0; b < batch_size; b++) {
         delete [] input_data[b];
         delete [] ground_truth[b];
       }
     }
-
-    
 
     //Average weights
     // for(int d = 0; d < fl_devices; d++){

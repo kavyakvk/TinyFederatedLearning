@@ -21,4 +21,11 @@ class FCLayer {
         //void set_weights(double **new_weights); //NEEDS TO BE FIXED
 };
 
+void FL_round_simulation(double **input_float, int **ground_truth, int local_episodes, 
+                        double learning_rate, FCLayer *model, bool verbose);
+
+void FL_round_quantize(int **input_data, int **ground_truth, int local_epochs, 
+                double learning_rate, FCLayer *model);
+
+
 #endif

@@ -77,7 +77,7 @@ def main():
 		# Send embedding
 		ard.write(embeddings)
 		print("Mac: sent embeddings")
-		time.sleep(2)
+		time.sleep(1)
 
 		# Serial read section
 		msg = ard.read(ard.inWaiting()) # read all characters in buffer
@@ -87,7 +87,7 @@ def main():
 		# Send ground truth
 		ard.write(ground_truths)
 		print("Mac: sent ground truths")
-		time.sleep(2)
+		time.sleep(1)
 
 		# Read Arduino's response
 		msg = ard.read(ard.inWaiting()) # read all characters in buffer
@@ -96,7 +96,7 @@ def main():
 		# Send initial weights
 		ard.write(init_weights_str)
 		print("Mac: sent initial weights")
-		time.sleep(2)
+		time.sleep(5)
 
 		# Read Arduino's response
 		msg = ard.read(ard.inWaiting()) # read all characters in buffer
