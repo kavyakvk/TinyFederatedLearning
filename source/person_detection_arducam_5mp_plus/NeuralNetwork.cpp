@@ -7,6 +7,8 @@
 #include "FCLayer.h" 
 // #include "FL_model_weights.h"
 #include <cstring>
+#include "Particle.h"
+#include <Arduino.h>
 using namespace std;
 
 //TODO: PUT THIS SOMEWHERE srand (time(NULL));
@@ -343,17 +345,24 @@ FCLayer::~FCLayer() {
 }
 
 void FL_round_simulation(double **input_float, int **ground_truth, int local_episodes, 
-						double learning_rate, FCLayer *model, bool verbose){
+						double learning_rate, FCLayer *model, bool verbose, bool local){
 	
-	cout << "inside called sim \n";
 	if(verbose == true){
-		cout << "\tstarted sim\n";
+		if(local == true){
+			cout << "\tstarted sim\n";
+		}else{
+			Serial.print("\tstarted sim\n");
+		}
 	}
 	double **output = new double*[model->batch_size];
 	double **input_error = new double*[model->batch_size];
 
 	if(verbose == true){
-		cout << "\tallocated\n";
+		if(local == true){
+			cout << "\tallocated\n";
+		}else{
+			Serial.print("\tallocated\n");
+		}
 	}
 
 	for(int b = 0; b < model->batch_size; b++) {
@@ -369,22 +378,35 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 	}
 
 	if(verbose == true){
-		cout << "\tallocated part 2\n";
-		cout << "\tinitial bias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
-		cout << "\tinitial output " << output[0][0] << " " << output[0][1] << "\n";
+		if(local == true){
+			cout << "\tallocated part 2\n";
+			cout << "\tinitial bias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
+			cout << "\tinitial output " << output[0][0] << " " << output[0][1] << "\n";
+		}else{
+			Serial.print("\tallocated\n");
+		}
 	}
 
 	for(int epi = 0; epi <= local_episodes; epi++){
 		if(verbose == true){
-			cout << "EPISODE " << epi << "\n";
+			if(local == true){
+				cout << "EPISODE " << epi << "\n";
+			}else{
+				Serial.print("\tEPISODE %d\n", epi);
+			}
 		}
 		//forward
 		model->forward(input_float, output);
 
 		if(verbose == true){
-			cout << "\tforward\n";
-			cout << "\t\tbias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
-			cout << "\t\toutput " << output[0][0] << " " << output[0][1] << "\n";
+			if(local == true){
+				cout << "\tforward\n";
+				cout << "\t\tbias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
+				cout << "\t\toutput before softmax" << output[0][0] << " " << output[0][1] << "\n";
+			}else{
+				Serial.print("\tforward\n\t\t bias loaded %lf %lf output before softmax %lf %lf\n", 
+					model->bias[0], model->bias[1], output[0][0], output[0][1]);
+			}
 		}
 
 		for(int b = 0; b < model->batch_size; b++) {
@@ -393,28 +415,43 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		}
 
 		if(verbose == true){
-			cout << "\tsoftmax " << output[0][0] << " " << output[0][1] << "\n";
+			if(local == true){
+				cout << "\tsoftmax " << output[0][0] << " " << output[0][1] << "\n";
+			}else{
+				Serial.print("\tsoftmax %lf %lf\n", output[0][0], output[0][1]);
+			}
 		}
 
 		//calculate and print error
 		double error = mse(output, ground_truth, model->batch_size, model->output_size);
 
 		if(verbose == true){
-			cout << "\terror, " << error << "\n";
+			if(local == true){
+				cout << "\terror, " << error << "\n";
+			}else{
+				Serial.print("\terror, %lf\n", error);
+			}
 		}
 
 		//backward
 		model->backward(output, ground_truth, input_error, input_float, learning_rate);
 
 		if(verbose == true){
-			cout << "\tbackward\n";
+			if(local == true){
+				cout << "\tbackward\n";
+			}else{
+				Serial.print("\tbackward\n");
+			}
 		}
-		
 		//reset input_error and output in forward and backward 
 	}
 
 	if(verbose == true){
+		if(local == true){
 			cout << "\tdone loop\n";
+		}else{
+			Serial.print("\tdone loop\n");
+		}
 	}
 
 	for(int b = 0; b < model->batch_size; b++) {
@@ -425,7 +462,11 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 	delete [] output;
 
 	if(verbose == true){
+		if(local == true){
 			cout << "\tdone de-allocation\n";
+		}else{
+			Serial.print("\tdone de-allocation\n");
+		}
 	}
 }
 
