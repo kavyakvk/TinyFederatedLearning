@@ -28,6 +28,7 @@ limitations under the License.
 #include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow/lite/version.h"
 #include "FCLayer.h"
+#include <vector>
 //#include "FL_model_weights.h"
 
 //#include "NeuralNetwork.h"
@@ -218,7 +219,7 @@ void loop() {
 
       // Tokenize string and split by commas
       Serial.println("Splitting string for embedding");
-      double *embeddings_arr = new double[numChars];
+      double embeddings_arr[numChars];
       pch = strtok (readEmbeddingsString, ",;");
       int embedding_index = 0;
       while (pch != NULL){
@@ -263,7 +264,7 @@ void loop() {
 
       // Tokenize string and split by commas
       Serial.println("Splitting string for ground truths");
-      int *gt_arr = new int[batch_size * output_size];
+      int gt_arr[batch_size * output_size];
       pch = strtok (readTruthsString, ",;");
       int gt_index = 0;
       while (pch != NULL){
@@ -352,8 +353,6 @@ void loop() {
         delete [] input_data[b];
         delete [] ground_truth[b];
       }
-      delete [] embeddings_arr;
-      delete [] gt_arr;
     }
 
     //Average weights

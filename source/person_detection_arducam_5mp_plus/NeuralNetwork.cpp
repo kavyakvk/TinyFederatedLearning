@@ -324,9 +324,13 @@ FCLayer::~FCLayer(void) {
 }
 
 void FL_round_simulation(double **input_float, int **ground_truth, int local_episodes, 
-						double learning_rate, FCLayer *model){
+						double learning_rate, FCLayer *model, bool verbose){
 	double **output = new double*[model->batch_size];
 	double **input_error = new double*[model->batch_size];
+
+	if(verbose){
+		cout << "\tallocated";
+	}
 
 	for(int b = 0; b < model->batch_size; b++) {
 		input_float[b] = new double[model->input_size];
@@ -334,27 +338,55 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		input_error[b] = new double[model->input_size];
 	}
 
+	if(verbose){
+		cout << "\tallocated part 2";
+	}
+
 	for(int epi = 0; epi <= local_episodes; epi++){
 		//forward
 		model->forward(input_float, output);
+
+		if(verbose){
+			cout << "\tforward";
+		}
 
 		for(int b = 0; b < model->batch_size; b++) {
 			//softmax to get probabilities
 			softmax(output[b], output[b]);
 		}
 
+		if(verbose){
+			cout << "\tsoftmax";
+		}
+
 		//calculate and print error
 		double error = mse(output, ground_truth);
 
+		if(verbose){
+			cout << "\terror, " << error << " !";
+		}
+
 		//backward
 		model->backward(output, ground_truth, input_error, input_float, learning_rate);
+
+		if(verbose){
+			cout << "\tbackward";
+		}
 		
 		//reset input_error and output in forward and backward 
+	}
+
+	if(verbose){
+			cout << "\tdone loop";
 	}
 
 	for(int b = 0; b < model->batch_size; b++) {
 		delete [] input_error[b];
 		delete [] output[b];
+	}
+
+	if(verbose){
+			cout << "\tdone de-allocation";
 	}
 }
 

@@ -1,0 +1,183 @@
+==30546== Memcheck, a memory error detector
+==30546== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==30546== Using Valgrind-3.17.0.GIT-lbmacos-adaae87a41-20201121 and LibVEX; rerun with -h for copyright info
+==30546== Command: ./cpp_tester
+==30546== Parent PID: 30351
+==30546== 
+--30546-- 
+--30546-- Valgrind options:
+--30546--    --leak-check=full
+--30546--    --show-leak-kinds=all
+--30546--    --track-origins=yes
+--30546--    --verbose
+--30546--    --log-file=valgrind-out.txt
+--30546-- Output from sysctl({CTL_KERN,KERN_VERSION}):
+--30546--   Darwin Kernel Version 18.7.0: Thu Jun 18 20:50:10 PDT 2020; root:xnu-4903.278.43~1/RELEASE_X86_64
+--30546-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand
+--30546-- Page sizes: currently 4096, max supported 4096
+--30546-- Valgrind library directory: /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind
+--30546-- ./cpp_tester (rx at 0x100000000, rw at 0x100006000)
+--30546--    reading syms   from primary file (26 149)
+--30546--    dSYM= ./cpp_tester.dSYM/Contents/Resources/DWARF/cpp_tester
+--30546--    dSYM does not have correct UUID (out of date?)
+--30546-- run: /usr/bin/dsymutil "./cpp_tester"
+--30546--    dsyms= ./cpp_tester.dSYM/Contents/Resources/DWARF/cpp_tester
+--30546-- /usr/lib/dyld (rx at 0x10000c000, rw at 0x100077000)
+--30546--    reading syms   from primary file (5 2133)
+--30546-- Scheduler: using generic scheduler lock implementation.
+--30546-- Reading suppressions file: /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/default.supp
+==30546== embedded gdbserver: reading from /var/folders/fh/2kh5624x67xg8bzs6xjpqlsc0000gn/T//vgdb-pipe-from-vgdb-to-30546-by-kavyakopparapu-on-???
+==30546== embedded gdbserver: writing to   /var/folders/fh/2kh5624x67xg8bzs6xjpqlsc0000gn/T//vgdb-pipe-to-vgdb-from-30546-by-kavyakopparapu-on-???
+==30546== embedded gdbserver: shared mem   /var/folders/fh/2kh5624x67xg8bzs6xjpqlsc0000gn/T//vgdb-pipe-shared-mem-vgdb-30546-by-kavyakopparapu-on-???
+==30546== 
+==30546== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==30546== don't want to do, unless you know exactly what you're doing,
+==30546== or are doing some strange experiment):
+==30546==   /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/../../bin/vgdb --pid=30546 ...command...
+==30546== 
+==30546== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==30546==   /path/to/gdb ./cpp_tester
+==30546== and then give GDB the following command
+==30546==   target remote | /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/../../bin/vgdb --pid=30546
+==30546== --pid is optional if only one valgrind process is running
+==30546== 
+--30546-- REDIR: 0x10004d120 (dyld:strcmp) redirected to 0x258057910 (???)
+--30546-- REDIR: 0x1000475f6 (dyld:arc4random) redirected to 0x2580579ae (???)
+--30546-- REDIR: 0x10004c500 (dyld:strlen) redirected to 0x2580578df (???)
+--30546-- REDIR: 0x10004d420 (dyld:strcpy) redirected to 0x25805792c (???)
+--30546-- REDIR: 0x10004a6f0 (dyld:strcat) redirected to 0x2580578f0 (???)
+--30546-- REDIR: 0x10004c2f0 (dyld:strlcat) redirected to 0x258057949 (???)
+--30546-- /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_core-amd64-darwin.so (rx at 0x1000d7000, rw at 0x1000db000)
+--30546--    reading syms   from primary file (3 52)
+--30546--    dSYM= /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_core-amd64-darwin.so.dSYM/Contents/Resources/DWARF/vgpreload_core-amd64-darwin.so
+--30546-- /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so (rx at 0x1000de000, rw at 0x1000e5000)
+--30546--    reading syms   from primary file (75 61)
+--30546--    dSYM= /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so.dSYM/Contents/Resources/DWARF/vgpreload_memcheck-amd64-darwin.so
+--30546-- /usr/lib/libc++.1.dylib (rx at 0x1000ea000, rw at 0x10013e000)
+--30546--    reading syms   from primary file (2023 1671)
+--30546-- /usr/lib/libSystem.B.dylib (rx at 0x10019d000, rw at 0x10019f000)
+--30546--    reading syms   from primary file (29 7)
+--30546-- /usr/lib/libc++abi.dylib (rx at 0x1001a4000, rw at 0x1001ba000)
+--30546--    reading syms   from primary file (375 604)
+--30546-- /usr/lib/system/libcache.dylib (rx at 0x1001d0000, rw at 0x1001d5000)
+--30546--    reading syms   from primary file (32 28)
+--30546-- /usr/lib/system/libcommonCrypto.dylib (rx at 0x1001da000, rw at 0x1001e5000)
+--30546--    reading syms   from primary file (222 164)
+--30546-- /usr/lib/system/libcompiler_rt.dylib (rx at 0x1001f2000, rw at 0x1001fa000)
+--30546--    reading syms   from primary file (510 8)
+--30546-- /usr/lib/system/libcopyfile.dylib (rx at 0x100207000, rw at 0x100211000)
+--30546--    reading syms   from primary file (11 37)
+--30546-- /usr/lib/system/libcorecrypto.dylib (rx at 0x100217000, rw at 0x10029c000)
+--30546--    reading syms   from primary file (525 697)
+--30546-- /usr/lib/system/libdispatch.dylib (rx at 0x1002b8000, rw at 0x1002f2000)
+--30546--    reading syms   from primary file (300 878)
+--30546-- /usr/lib/system/libdyld.dylib (rx at 0x100322000, rw at 0x10034f000)
+--30546--    reading syms   from primary file (107 1127)
+--30546-- /usr/lib/system/libkeymgr.dylib (rx at 0x10036d000, rw at 0x10036e000)
+--30546--    reading syms   from primary file (11 2)
+--30546-- /usr/lib/system/libmacho.dylib (rx at 0x100379000, rw at 0x10037f000)
+--30546--    reading syms   from primary file (105 2)
+--30546-- /usr/lib/system/libquarantine.dylib (rx at 0x100385000, rw at 0x100388000)
+--30546--    reading syms   from primary file (71 12)
+--30546-- /usr/lib/system/libremovefile.dylib (rx at 0x10038e000, rw at 0x100390000)
+--30546--    reading syms   from primary file (12 6)
+--30546-- /usr/lib/system/libsystem_asl.dylib (rx at 0x100395000, rw at 0x1003ad000)
+--30546--    reading syms   from primary file (220 227)
+--30546-- /usr/lib/system/libsystem_blocks.dylib (rx at 0x1003ba000, rw at 0x1003bb000)
+--30546--    reading syms   from primary file (21 7)
+--30546-- /usr/lib/system/libsystem_c.dylib (rx at 0x1003bf000, rw at 0x100447000)
+--30546--    reading syms   from primary file (1342 803)
+--30546-- /usr/lib/system/libsystem_configuration.dylib (rx at 0x10046f000, rw at 0x100473000)
+--30546--    reading syms   from primary file (38 64)
+--30546-- /usr/lib/system/libsystem_coreservices.dylib (rx at 0x100479000, rw at 0x10047d000)
+--30546--    reading syms   from primary file (14 43)
+--30546-- /usr/lib/system/libsystem_darwin.dylib (rx at 0x100482000, rw at 0x100489000)
+--30546--    reading syms   from primary file (40 331)
+--30546-- /usr/lib/system/libsystem_dnssd.dylib (rx at 0x100493000, rw at 0x10049a000)
+--30546--    reading syms   from primary file (39 34)
+--30546-- /usr/lib/system/libsystem_info.dylib (rx at 0x10049f000, rw at 0x1004eb000)
+--30546--    reading syms   from primary file (426 719)
+--30546-- /usr/lib/system/libsystem_m.dylib (rx at 0x100501000, rw at 0x10054d000)
+--30546--    reading syms   from primary file (811 1)
+--30546-- /usr/lib/system/libsystem_malloc.dylib (rx at 0x10055b000, rw at 0x100586000)
+--30546--    reading syms   from primary file (156 420)
+--30546-- /usr/lib/system/libsystem_networkextension.dylib (rx at 0x100595000, rw at 0x1005a0000)
+--30546--    reading syms   from primary file (99 180)
+--30546-- /usr/lib/system/libsystem_notify.dylib (rx at 0x1005ab000, rw at 0x1005b3000)
+--30546--    reading syms   from primary file (23 1)
+--30546-- /usr/lib/system/libsystem_sandbox.dylib (rx at 0x1005b9000, rw at 0x1005bd000)
+--30546--    reading syms   from primary file (100 13)
+--30546-- /usr/lib/system/libsystem_secinit.dylib (rx at 0x1005c3000, rw at 0x1005c6000)
+--30546--    reading syms   from primary file (4 7)
+--30546-- /usr/lib/system/libsystem_kernel.dylib (rx at 0x1005cb000, rw at 0x1005f4000)
+--30546--    reading syms   from primary file (1307 120)
+--30546-- /usr/lib/system/libsystem_platform.dylib (rx at 0x10060e000, rw at 0x100618000)
+--30546--    reading syms   from primary file (166 105)
+--30546-- /usr/lib/system/libsystem_pthread.dylib (rx at 0x100620000, rw at 0x10062b000)
+--30546--    reading syms   from primary file (186 99)
+--30546-- /usr/lib/system/libsystem_symptoms.dylib (rx at 0x100635000, rw at 0x10063d000)
+--30546--    reading syms   from primary file (10 89)
+--30546-- /usr/lib/system/libsystem_trace.dylib (rx at 0x100643000, rw at 0x100659000)
+--30546--    reading syms   from primary file (128 237)
+--30546-- /usr/lib/system/libunwind.dylib (rx at 0x100668000, rw at 0x10066e000)
+--30546--    reading syms   from primary file (102 52)
+--30546-- /usr/lib/system/libxpc.dylib (rx at 0x100675000, rw at 0x1006a5000)
+--30546--    reading syms   from primary file (590 928)
+--30546-- /usr/lib/libobjc.A.dylib (rx at 0x1006c8000, rw at 0x100e4e000)
+--30546--    reading syms   from primary file (360 900)
+--30546-- REDIR: 0x10060f740 (libsystem_platform.dylib:_platform_memcmp) redirected to 0x1000e1c53 (_platform_memcmp)
+--30546-- REDIR: 0x10060ffc0 (libsystem_platform.dylib:_platform_strncmp) redirected to 0x1000e15ed (_platform_strncmp)
+--30546-- REDIR: 0x100610360 (libsystem_platform.dylib:_platform_strcmp) redirected to 0x1000e1667 (_platform_strcmp)
+--30546-- REDIR: 0x10055f3a6 (libsystem_malloc.dylib:calloc) redirected to 0x1000dff36 (calloc)
+--30546-- REDIR: 0x10055f52c (libsystem_malloc.dylib:malloc_default_zone) redirected to 0x1000e0c61 (malloc_default_zone)
+--30546-- REDIR: 0x10055cc32 (libsystem_malloc.dylib:malloc_zone_malloc) redirected to 0x1000dfb88 (malloc_zone_malloc)
+--30546-- REDIR: 0x10055f3e1 (libsystem_malloc.dylib:malloc_zone_calloc) redirected to 0x1000e0122 (malloc_zone_calloc)
+--30546-- REDIR: 0x10055cbfd (libsystem_malloc.dylib:malloc) redirected to 0x1000df920 (malloc)
+--30546-- REDIR: 0x10055f536 (libsystem_malloc.dylib:malloc_zone_from_ptr) redirected to 0x1000e0ca2 (malloc_zone_from_ptr)
+--30546-- REDIR: 0x10055f839 (libsystem_malloc.dylib:free) redirected to 0x1000dfcfc (free)
+--30546-- REDIR: 0x10056287d (libsystem_malloc.dylib:realloc) redirected to 0x1000e02b4 (realloc)
+--30546-- REDIR: 0x1006101a0 (libsystem_platform.dylib:_platform_strchr$VARIANT$Haswell) redirected to 0x1000e0f13 (_platform_strchr$VARIANT$Haswell)
+--30546-- REDIR: 0x1006106c0 (libsystem_platform.dylib:_platform_memchr$VARIANT$Haswell) redirected to 0x1000e16e8 (_platform_memchr$VARIANT$Haswell)
+==30546== Conditional jump or move depends on uninitialised value(s)
+==30546==    at 0x1000DF93C: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==30546==    by 0x1001A5377: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==30546==    by 0x100002379: main (in ./cpp_tester)
+==30546==  Uninitialised value was created by a stack allocation
+==30546==    at 0x100002044: main (in ./cpp_tester)
+==30546== 
+==30546== Warning: set address range perms: large range [0x1048d7040, 0x128f8c200) (undefined)
+==30546== Conditional jump or move depends on uninitialised value(s)
+==30546==    at 0x1000DF93C: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==30546==    by 0x1001A5377: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
+==30546==    by 0x1000023B9: main (in ./cpp_tester)
+==30546==  Uninitialised value was created by a stack allocation
+==30546==    at 0x100002044: main (in ./cpp_tester)
+==30546== 
+==30546== Warning: set address range perms: large range [0x128f8d040, 0x14d642200) (undefined)
+==30546== Conditional jump or move depends on uninitialised value(s)
+==30546==    at 0x1000023EE: main (in ./cpp_tester)
+==30546==  Uninitialised value was created by a stack allocation
+==30546==    at 0x100002044: main (in ./cpp_tester)
+==30546== 
+==30546== Invalid read of size 8
+==30546==    at 0x1000024C1: main (in ./cpp_tester)
+==30546==  Address 0x1048d7000 is in a rwx anonymous segment
+==30546== 
+==30546== Invalid read of size 4
+==30546==    at 0x10000252A: main (in ./cpp_tester)
+==30546==  Address 0x1048d7000 is in a rwx anonymous segment
+==30546== 
+==30546== 
+==30546== Process terminating with default action of signal 11 (SIGSEGV)
+==30546==  Access not within mapped region at address 0x153643000
+==30546==    at 0x1000024C1: main (in ./cpp_tester)
+==30546==  If you believe this happened as a result of a stack
+==30546==  overflow in your program's main thread (unlikely but
+==30546==  possible), you can try to increase the size of the
+==30546==  main thread stack using the --main-stacksize= flag.
+==30546==  The main thread stack size used in this run was 8388608.
+==30546== 
+==30546== HEAP SUMMARY:
+==30546==     in use at exit: 2,550,001,332 bytes in 1,291,951 blocks
+==30546==   total heap usage: 1,292,230 allocs, 279 frees, 2,550,013,916 bytes allocated
+==30546== 
