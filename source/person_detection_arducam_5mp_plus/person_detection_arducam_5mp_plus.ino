@@ -47,9 +47,9 @@ const int input_size = 256;
 const int output_size = 2;
 const double quant_scale = 0.04379776492714882;
 const int quant_zero_point = -128;
-const int fl_devices = 3;
-const int batch_size = 5;
-const int local_epochs = 3;
+const int fl_devices = 1;
+const int batch_size = 1;
+const int local_epochs = 1;
 const bool real_world = false; // change this if want to use Arducam
 static int current_round = 0;
 static char readEmbeddingsString[input_size * batch_size * (sizeof(double) / sizeof(char))];
@@ -146,6 +146,9 @@ void setup() {
 
 // The name of this function is important for Arduino compatibility.
 void loop() {
+  Serial.println("Connected");
+  delay(5000);
+  
   if(real_world){
     // Get image from provider.
     if (kTfLiteOk != GetImage(error_reporter, kNumCols, kNumRows, kNumChannels,
@@ -369,9 +372,11 @@ void loop() {
 
 
 
-      Serial.print("finished loading data into input data and ground truth");
+      Serial.println("finished loading data into input data and ground truth");
 
       FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel, true);
+
+      Serial.println("finished simulation");
 
       NNmodel->cleanup();
 
@@ -379,6 +384,8 @@ void loop() {
         delete [] input_data[b];
         delete [] ground_truth[b];
       }
+      delete [] input_data;
+      delete [] ground_truth;
     }
 
     
