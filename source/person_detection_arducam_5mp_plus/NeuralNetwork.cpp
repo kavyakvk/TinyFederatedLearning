@@ -326,10 +326,11 @@ void FCLayer::backward (double **output, int **ground_truth,
 	for(int b = 0; b < batch_size; b++){
 	    delete [] output_error[b];
 	}
+	delete [] output_error;
 }
 
 void FCLayer::cleanup(){
-	cout << weights[0][0] << "\n";
+	cout << "cleaning up object\n";
 	for(int i = 0; i < input_size; i++) {
 		delete [] weights[i];
 	}
@@ -420,6 +421,8 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		delete [] input_error[b];
 		delete [] output[b];
 	}
+	delete [] input_error;
+	delete [] output;
 
 	if(verbose == true){
 			cout << "\tdone de-allocation\n";
@@ -466,4 +469,7 @@ void FL_round_quantize(int **input_data, int **ground_truth, int local_epochs,
 		delete [] input_error[b];
 		delete [] output[b];
 	}
+	delete [] input_float;
+	delete [] input_error;
+	delete [] output;
 }

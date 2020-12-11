@@ -83,4 +83,6 @@ int main(void){
     	delete [] input_data[b];
 		delete [] ground_truth[b];
 	}
+	delete [] input_data;
+	delete [] ground_truth;
 }
