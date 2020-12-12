@@ -49,17 +49,20 @@ def main():
 	# train_masked = masked_data[:5]
 	# train_unmasked = unmasked_data[:5]
 	masked_batched = generate_batched_data(masked_data, batched_num=5)
-	print(masked_batched[0])
+	# print(masked_batched[0])
 
 	# Initial Weights
 	init_weights = pickle.load(open('../../dl/pickle_initial_model_weights.p', 'rb'))
-	init_weights_str = (",".join(map(str, init_weights))).encode()
-	print(init_weights_str)
-	print(len(init_weights))
+	init_bias = [0.08060145, -0.08060154];			# bias (initial)
+	init_weights.extend(init_bias)					# extend bias to end of 1d weights array
+	init_weights_str = (",".join(map(str, init_weights)) + "\n").encode()
+	print(init_weights_str[-50:])		
+	# print(len(init_weights))		# 256*2 + 2
+	# print(len(init_weights_str))
 
 
 	# Setup connection to Arduino
-	port = '/dev/cu.usbmodem14401' # change this to what the Arduino Port is
+	port = '/dev/cu.usbmodem142301' # change this to what the Arduino Port is
 	ard = serial.Serial(port,9600,timeout=5)
 	time.sleep(5) # wait for Arduino
 
@@ -71,31 +74,38 @@ def main():
 		# Serial write section
 		ard.flush()
 
-		# Get embedding and ground truth
-		embeddings, ground_truths = masked_batched[0]
+		# # Get embedding and ground truth
+		# embeddings, ground_truths = masked_batched[0]
 
-		# Send embedding
-		ard.write(embeddings)
-		print("Mac: sent embeddings")
-		time.sleep(1)
+		# # Send embedding
+		# ard.write(embeddings)
+		# print("Mac: sent embeddings")
+		# time.sleep(1)
 
-		# Serial read section
-		msg = ard.read(ard.inWaiting()) # read all characters in buffer
-		print(f"Mac: received {msg}")
-		# print (f"Mac: received {msg.decode('utf-8')}")
+		# # Serial read section
+		# msg = ard.read(ard.inWaiting()) # read all characters in buffer
+		# print(f"Mac: received {msg}")
+		# # print (f"Mac: received {msg.decode('utf-8')}")
 
-		# Send ground truth
-		ard.write(ground_truths)
-		print("Mac: sent ground truths")
-		time.sleep(1)
+		# # Send ground truth
+		# ard.write(ground_truths)
+		# print("Mac: sent ground truths")
+		# time.sleep(1)
+
+		# Read Arduino's response
+		# msg = ard.read(ard.inWaiting()) # read all characters in buffer
+		# print(f"Mac: received {msg}")
+
+		# Send initial weights
+		ard.write(init_weights_str[:3000])
+		# ard.write("0.63,0.68,0.12,0.12,0.12,-0.1\n".encode())
+		time.sleep(5)
+		print("Mac: sent initial weights and bias")
+		time.sleep(9)
 
 		# Read Arduino's response
 		msg = ard.read(ard.inWaiting()) # read all characters in buffer
 		print(f"Mac: received {msg}")
-
-		# Send initial weights
-		ard.write(init_weights_str)
-		print("Mac: sent initial weights")
 		time.sleep(5)
 
 		# Read Arduino's response

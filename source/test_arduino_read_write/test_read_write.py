@@ -33,11 +33,11 @@ def ack_handshake(ard):
 
 def main():
     #The following line is for serial over GPIO
-    port = '/dev/cu.usbmodem142101' # change this to what the Arduino Port is
+    port = '/dev/cu.usbmodem142301' # change this to what the Arduino Port is
     ard = serial.Serial(port,9600,timeout=5)
 
     test_embeddings = [
-        "0.63,0.68,0.12,0.12,0.12,-0.1",
+        "0.63,0.68,0.12,0.12,0.12,-0.1\n",
         "0.1,0.0,0,0.8\n",
         "3",
         "4",
@@ -49,7 +49,7 @@ def main():
 
     i = 0
 
-    while (i < 1):
+    while (i < 2):
         # Serial write section
         ard.flush()
         print("Mac: sent embeddings")

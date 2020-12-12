@@ -201,13 +201,33 @@ FCLayer::FCLayer (int input_sz, int output_sz,
 	quant_scale = scale;
 }
 
-/*
-void FCLayer::set_weights(double **new_weights){
+
+void FCLayer::set_weights_bias(double **new_weights, double *new_bias){
+	// Deallocate weights
+	for(int i = 0; i < input_size; i++) {
+		delete [] weights[i];
+	}
+	delete[] weights;
+
+	// Reallocate weights
+	weights = new double*[input_size];
 	for(int i = 0; i < input_size; ++i) {
-		std::memcpy(weights, new_weights, sizeof(double)*output_size);
+		weights[i] = new double[output_size];
+		for (int j = 0; j < output_size; ++j){
+			weights[i][j] = new_weights[i][j];
+		}		
+	}
+
+	// Deallocate bias
+	delete[] bias;
+
+	// Reallocate bias
+	bias = new double[output_size];
+	for(int j = 0; j < output_size; j++) {
+		bias[j] = new_bias[j];
 	}
 }
-*/
+
 void softmax(double *input_output_data, int classes){
 	double sum = 0;
 	for(int i = 0; i < classes; i++){

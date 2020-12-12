@@ -18,7 +18,7 @@ class FCLayer {
         void dequantize(int *input_data, double *input_float);
         void cleanup();
         ~FCLayer();
-        //void set_weights(double **new_weights); //NEEDS TO BE FIXED
+        void set_weights_bias(double **new_weights, double *new_bias);
 };
 
 void FL_round_simulation(double **input_float, int **ground_truth, int local_episodes, 

@@ -54,7 +54,8 @@ const bool real_world = false; // change this if want to use Arducam
 static int current_round = 0;
 static char readEmbeddingsString[input_size * batch_size * (sizeof(double) / sizeof(char))];
 static char readTruthsString[batch_size * output_size * (sizeof(double) / sizeof(char))];
-static char readWeightsString[input_size * output_size * (sizeof(double) / sizeof(char))];
+//static char readWeightsString[input_size * output_size * (sizeof(double) / sizeof(char))];
+static char readWeightsString[5856];
 
 // In order to use optimized tensorflow lite kernels, a signed int8 quantized
 // model is preferred over the legacy unsigned model format. This means that
@@ -142,7 +143,6 @@ void setup() {
   }
   
   Serial.begin(9600);  // initialize serial communications at 9600 bps
-  pinMode(11, OUTPUT);  // red
 }
 
 // The name of this function is important for Arduino compatibility.
@@ -273,7 +273,7 @@ void loop() {
       // // Reading in ground truths
       // while(!Serial.available()) {delay(500);} // wait for data to arrive
       // // serial read section
-      // while (Serial.available() > 0 || endOfResponse == false)
+      // while (Serial.available() > 0)
       // {
       //   if (Serial.available() > 0)
       //   {
@@ -335,52 +335,65 @@ void loop() {
         }
       }
 
-
-      // // GET WEIGHTS double** (input_size x output_size x)
-      // readWeightsString = '\0';     // reset
-      // ndx = 0;
-      // endOfResponse = false;
-      // while(!Serial.available()) {delay(500);} // wait for data to arrive
-      // // serial read section
-      // while (Serial.available() > 0 || endOfResponse == false)
-      // {
-      //   if (Serial.available() > 0)
-      //   {
-      //     char c = Serial.read();  //gets one byte from serial buffer
-      //     readWeightsString[ndx] = c; //adds to the string
-      //     ndx += 1;
-      //     if (c == '\n'){
-      //       endOfResponse = true;
-      //       Serial.println("A: Finished reading in weights");
-      //     }
-      //   }
-      // }
-      // delay(500);
-      // // Tokenize string and split by commas
-      // Serial.println("Splitting string for weights");
-      // double **init_weights = new double*[NNmodel->input_size];
-      // for(int i = 0; i < NNmodel->input_size; i++){
-      //   for(int j = 0; j < NNmodel->output_size; j++){
-      //     if(i == 0 & j == 0){
-      //       pch = strtok (readWeightsString, ",;");
-      //     }
-      //     else{
-      //       pch = strtok (NULL, ",;");
-      //     }
-      //     init_weights[i][j] = atof(pch);
-      //   }
-      // }
-
-
-
-
       Serial.println("finished loading data into input data and ground truth");
+      delay(500);
+      // GET WEIGHTS double** (input_size x output_size x)
+//      memset(readWeightsString, 0, sizeof(readWeightsString));     // reset
+      readWeightsString[0] = '\0';
+      ndx = 0;
+      endOfResponse = false;
+      while(!Serial.available()) {} // wait for data to arrive
+      // serial read section
+      while (Serial.available() > 0 || ndx < 100)
+      {
+        if (Serial.available() > 0)
+        {
+          char c = Serial.read();  //gets one byte from serial buffer
+          readWeightsString[ndx] = c; //adds to the string
+          ndx += 1;
+          if (c == '\n'){
+            endOfResponse = true;
+            Serial.println("A: Finished reading in weights and bias");
+          }
+        }
+      }
+      // Tokenize string and split by commas
+      Serial.println(ndx);
+      Serial.println(NNmodel->input_size);
+      Serial.println("Splitting string for weights");
+//      Serial.println(strtok(readWeightsString, ",;\n"));
+      double **init_weights = new double*[NNmodel->input_size];
+      for(int i = 0; i < NNmodel->input_size; i++){
+        init_weights[i] = new double[NNmodel->output_size];
+        for(int j = 0; j < NNmodel->output_size; j++){
+          if(i == 0 && j == 0){
+            pch = strtok (readWeightsString, ",;\n");
+          }
+          else{
+            pch = strtok (NULL, ",;\n");
+          }
+          init_weights[i][j] = (double)atof(pch);
+          Serial.print(init_weights[i][j]);
+          Serial.print(" ");
+        }
+      }
+      // Tokenize string for bias
+      Serial.println("Splitting string for bias");
+      double *init_bias = new double[NNmodel->output_size];
+      for(int i = 0; i < NNmodel->output_size; i++){
+        pch = strtok (NULL, ",;");  // leftover from weights string
+        init_bias[i] = atof(pch);
+        Serial.print(init_bias[i]);
+        Serial.print(" ");
+      }
 
-      digitalWrite(11, HIGH);     // red  
+      Serial.println("Finished loading in and setting weights + bias");
 
-      FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel, true, false);
-
-      Serial.println("finished simulation");
+//      NNmodel->set_weights_bias(init_weights, init_bias);
+//
+//      FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel, true, false);
+//
+//      Serial.println("Finished simulation");
 
       NNmodel->cleanup();
 

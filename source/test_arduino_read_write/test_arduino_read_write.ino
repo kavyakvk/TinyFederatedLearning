@@ -3,7 +3,7 @@
 static byte ndx = 0;  // For keeping track where in the char array to input
 const byte numChars = 256;
 char readString[numChars];
-bool endOfResponse = false; 
+bool endOfResponse = true; 
 float embeddings_arr[10] = { };     // initialize all elements to 0
 char * pch;
 
@@ -23,7 +23,7 @@ void setup()
 {
 
   Serial.begin(9600);  // initialize serial communications at 9600 bps
-
+  Serial.println("please print");
 }
 
 void loop()
@@ -32,7 +32,7 @@ void loop()
   ndx = 0;
   while(!Serial.available()) {} // wait for data to arrive
   // serial read section
-  while (Serial.available() > 0 && endOfResponse == false)
+  while (Serial.available() > 0)
   {
     if (Serial.available() >0)
     {
@@ -44,9 +44,10 @@ void loop()
       }
     }
   }
+//  Serial.println("read serial");
 
 
-  if (strlen(readString) > 0)
+  if (endOfResponse = true)
   {
     Serial.print("Arduino: received ");  
     Serial.println(readString); //see what was received
