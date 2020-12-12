@@ -8,7 +8,7 @@
 // #include "FL_model_weights.h"
 #include <cstring>
 //#include "Particle.h"
-#include <Arduino.h>
+//#include <Arduino.h>
 using namespace std;
 
 //TODO: PUT THIS SOMEWHERE srand (time(NULL));
@@ -201,13 +201,33 @@ FCLayer::FCLayer (int input_sz, int output_sz,
 	quant_scale = scale;
 }
 
-/*
-void FCLayer::set_weights(double **new_weights){
+
+void FCLayer::set_weights_bias(double **new_weights, double *new_bias){
+	// Deallocate weights
+	for(int i = 0; i < input_size; i++) {
+		delete [] weights[i];
+	}
+	delete[] weights;
+
+	// Reallocate weights
+	weights = new double*[input_size];
 	for(int i = 0; i < input_size; ++i) {
-		std::memcpy(weights, new_weights, sizeof(double)*output_size);
+		weights[i] = new double[output_size];
+		for (int j = 0; j < output_size; ++j){
+			weights[i][j] = new_weights[i][j];
+		}		
+	}
+
+	// Deallocate bias
+	delete[] bias;
+
+	// Reallocate bias
+	bias = new double[output_size];
+	for(int j = 0; j < output_size; j++) {
+		bias[j] = new_bias[j];
 	}
 }
-*/
+
 void softmax(double *input_output_data, int classes){
 	double sum = 0;
 	for(int i = 0; i < classes; i++){
@@ -237,7 +257,6 @@ void FCLayer::forward (double **input_float, double **output) {
 	for(int b = 0; b < batch_size; b++){
 		for(int j = 0; j < output_size; j++){
 			output[b][j] = 0.0;
-			Serial.println(j);
 			for(int i = 0; i < input_size; i++){
 				output[b][j] = input_float[b][i]*weights[i][j];
 			}
@@ -269,6 +288,19 @@ double mse(double **pred, int **real, int batch_size, int classes){
 		}
 	}
 	return result/(classes*batch_size);
+}
+
+double accuracy(double **pred, int **real, int batch_size, int classes){
+	double correct = 0.0;
+
+	for(int b = 0; b < batch_size; b++){
+		for(int j = 0; j < classes; j++){
+			if(pred[b][j]-real[b][j] == 0){
+				correct += 1;
+			}
+		}
+	}
+	return correct/(classes*batch_size);
 }
 
 void FCLayer::backward (double **output, int **ground_truth, 
@@ -352,7 +384,7 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		if(local == true){
 			cout << "\tstarted sim\n";
 		}else{
-			Serial.print("\tstarted sim\n");
+			//Serial.print("\tstarted sim\n");
 		}
 	}
 	double **output = new double*[model->batch_size];
@@ -362,7 +394,7 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		if(local == true){
 			cout << "\tallocated\n";
 		}else{
-			Serial.print("\tallocated\n");
+			//Serial.print("\tallocated\n");
 		}
 	}
 
@@ -384,7 +416,7 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 			cout << "\tinitial bias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
 			cout << "\tinitial output " << output[0][0] << " " << output[0][1] << "\n";
 		}else{
-			Serial.print("\tallocated\n");
+			//Serial.print("\tallocated\n");
 		}
 	}
 
@@ -393,8 +425,8 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 			if(local == true){
 				cout << "EPISODE " << epi << "\n";
 			}else{
-				Serial.print("\tEPISODE");
-        		Serial.println(epi);
+				//Serial.print("\tEPISODE");
+        		//Serial.println(epi);
 			}
 		}
 		//forward
@@ -406,11 +438,11 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 				cout << "\t\tbias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
 				cout << "\t\toutput before softmax" << output[0][0] << " " << output[0][1] << "\n";
 			}else{
-				Serial.print("\tforward\n\t\t bias loaded");
-				Serial.print(model->bias[0], model->bias[1]);
-				Serial.print(" output before softmax ");
-				Serial.println(output[0][0]);
-				Serial.println(output[0][1]);
+				//Serial.print("\tforward\n\t\t bias loaded");
+				//Serial.print(model->bias[0], model->bias[1]);
+				//Serial.print(" output before softmax ");
+				//Serial.println(output[0][0]);
+				//Serial.println(output[0][1]);
 			}
 		}
 
@@ -423,21 +455,22 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 			if(local == true){
 				cout << "\tsoftmax " << output[0][0] << " " << output[0][1] << "\n";
 			}else{
-				Serial.print("\tsoftmax");
-				Serial.println(output[0][0]);
-				Serial.println(output[0][1]);
+				//Serial.print("\tsoftmax");
+				//Serial.println(output[0][0]);
+				//Serial.println(output[0][1]);
 			}
 		}
 
 		//calculate and print error
 		double error = mse(output, ground_truth, model->batch_size, model->output_size);
-
+		double acc = accuracy(output, ground_truth, model->batch_size, model->output_size);
+		cout << "\tlocal episode : " << epi << " error: " << error << " accuracy: " << acc << "\n";
 		if(verbose == true){
 			if(local == true){
-				cout << "\terror, " << error << "\n";
+				cout << "\tlocal episode : " << epi << " error: " << error << "\n";
 			}else{
-				Serial.print("\terror");
-				Serial.println(error);
+				//Serial.print("\terror");
+				//Serial.println(error);
 			}
 		}
 
@@ -448,7 +481,7 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 			if(local == true){
 				cout << "\tbackward\n";
 			}else{
-				Serial.print("\tbackward\n");
+				//Serial.print("\tbackward\n");
 			}
 		}
 		//reset input_error and output in forward and backward 
@@ -458,7 +491,7 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		if(local == true){
 			cout << "\tdone loop\n";
 		}else{
-			Serial.print("\tdone loop\n");
+			//Serial.print("\tdone loop\n");
 		}
 	}
 
@@ -473,7 +506,7 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		if(local == true){
 			cout << "\tdone de-allocation\n";
 		}else{
-			Serial.print("\tdone de-allocation\n");
+			//Serial.print("\tdone de-allocation\n");
 		}
 	}
 }

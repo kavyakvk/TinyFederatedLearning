@@ -10,9 +10,10 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
-#include <utility> // std::pair
+#include <string>
 #include <stdexcept> // std::runtime_error
 #include <sstream> // std::stringstream
+
 using namespace std;
 
 int main(int argc, char** argv){
@@ -20,16 +21,23 @@ int main(int argc, char** argv){
 	int output_size = 2;
 	double quant_scale = 0.04379776492714882;
 	int quant_zero_point = -128;
-	int fl_devices = stoi(argv[1]); //number of devices in the simulation
-	int local_episodes = stoi(argv[2]); //number of local epochs each device trains for
-	int data_per_device = stoi(argv[3]); //number of examples per device
-	int epoch_data_per_device = stoi(argv[4]); // number of examples during a given epoch
-	int batch_size = stoi(argv[5]); //batch size for the devices, epoch_data_per_device / batch_size = an int
-	int epochs = stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+	int fl_devices = 1;//stoi(argv[1]); //number of devices in the simulation
+	int local_episodes = 2;//stoi(argv[2]); //number of local epochs each device trains for
+	int data_per_device = 3;//stoi(argv[3]); //number of examples per device
+	int epoch_data_per_device = 9;//stoi(argv[4]); // number of examples during a given epoch
+	int batch_size = 3;//stoi(argv[5]); //batch size for the devices, epoch_data_per_device / batch_size = an int
+	int epochs = 20;//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
 	int data_per_round = data_per_device / epochs;
 
-	string embedding_data = "embeddings.csv";
-	string gt_data = "ground_truth.csv";
+	assert(1740 >= epochs*fl_devices*data_per_device);
+
+	/*
+		TESTING VALUES:
+		./simulation 1 2 3 9 3 10
+	*/
+
+	std::string embedding_data = "embeddings.txt";
+	std::string gt_data = "ground_truth.txt";
 
 	//READ DATA
 	ifstream data_file(embedding_data);
@@ -38,37 +46,19 @@ int main(int argc, char** argv){
 	if(!data_file.is_open()) throw runtime_error("Could not open data file");
 	if(!gt_file.is_open()) throw runtime_error("Could not open gt file");
 
-	vector<int> column;
-
-	string line_data, line_gt, colname;
-	int val = 0;
-	// Read the column names
-    if(data_file.good() && gt_file.good()){
-        // Extract the first line in the file
-        getline(data_file, line_data);
-        getline(gt_file, line_gt);
-
-        // Create a stringstream from line
-        stringstream ss_data(line_data);
-        stringstream ss_gt(line_gt);
-
-        // Extract each column name
-        while(getline(ss_data, colname, ',')){
-            if(stoi(colname) != val) throw runtime_error("column names incorrect");
-            val++;
-        }
-    }
+	std::string line_data;
+	std::string line_gt;
 
 	//CREATE DEVICES
 	FCLayer devices[fl_devices];
-	for(int d = 0; d <= fl_devices; d++){
-		devices[i] = FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, false, false);
+	for(int d = 0; d < fl_devices; d++){
+		devices[d] = FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, true);
 	}
 
 	//ALLOCATE MEMORY TO STORE DATA FOR ALL DEVICES
-	double ***input_data = new double**[fl_devices]
-	int ***ground_truth = new int**[fl_devices]
-	for(int d = 0; d <= fl_devices; d++){
+	double ***input_data = new double**[fl_devices];
+	int ***ground_truth = new int**[fl_devices];
+	for(int d = 0; d < fl_devices; d++){
 		input_data[d] = new double*[batch_size];
 	 	ground_truth[d] = new int*[batch_size];
 	 	for(int b = 0; b < batch_size; b++) {
@@ -96,14 +86,18 @@ int main(int argc, char** argv){
 
 	double data_val;
 	int gt_val;
+	//throw out first line if CSV
+	//getline(data_file, line_data);
+	//getline(gt_file, line_gt);
+
 	//FOR EPOCHS
-	for(int epoch = 0; epoch <= epochs; epoch++){
+	for(int epoch = 0; epoch < epochs; epoch++){
 		//TRAIN FOR EACH DEVICE
-		for(int d = 0; d <= fl_devices; d++){
+		for(int d = 0; d < fl_devices; d++){
 			FCLayer* NNmodel = &(devices[d]);
 
 			for(int b = 0; b < batch_size; b++) {
-				// Extract the first line in the file
+				// Extract the line in the file
 		        getline(data_file, line_data);
 		        getline(gt_file, line_gt);
 
@@ -112,16 +106,20 @@ int main(int argc, char** argv){
 		        stringstream ss_gt(line_gt);
 
 		        for(int i = 0; i < input_size; i++){
+		        	//cout << epoch << " " << d << " " << b << " " << i << ": ";
 		        	ss_data >> data_val;
+		        	//cout << data_val << "\n";
+
 		        	input_data[d][b][i] = data_val;
 		    	}
 		    	for (int j = 0; j < output_size; j++){
 		        	ss_gt >> gt_val;
-		        	ground_truth[d][b][j] = data_val;
-		    	}
 
+		        	ground_truth[d][b][j] = gt_val;
+		    	}
 			}
-			FL_round_simulation(input_data[d], ground_truth[d], local_episodes, 0.01, NNmodel, true);
+			cout << "epoch: " << epoch << " device: " << d << "\n";
+			FL_round_simulation(input_data[d], ground_truth[d], local_episodes, 0.0001, NNmodel, false, false);
 		}
 
 		//WEIGHT AVERAGING FOR EACH DEVICE
@@ -134,7 +132,7 @@ int main(int argc, char** argv){
 
 		for(int i = 0; i < input_size; i++){
 			for (int j = 0; j < output_size; j++){
-				for(int d = 0; d <= fl_devices; d++){
+				for(int d = 0; d < fl_devices; d++){
 					server_weights[i][j] += devices[d].weights[i][j];
 					server_bias[j] += devices[d].bias[j]/input_size;
 				}
@@ -142,8 +140,8 @@ int main(int argc, char** argv){
 		}
 
 		//DEPLOY WEIGHTS TO EACH DEVICE
-		for(int d = 0; d <= fl_devices; d++){
-			devices[d].set_weights(server_weights, server_bias);
+		for(int d = 0; d < fl_devices; d++){
+			devices[d].set_weights_bias(server_weights, server_bias);
 		}
 	}
 
@@ -158,12 +156,13 @@ int main(int argc, char** argv){
 	delete[] server_bias;
 
 	//DE-ALLOCATE MEMORY STORING DEVICES
-	for(int d = 0; d <= fl_devices; d++){
-		NNmodel->cleanup();
+	for(int d = 0; d < fl_devices; d++){
+		cout << fl_devices << "\n";
+		devices[d].cleanup();
 	}
 
 	//DE-ALLOCATE MEMORY STORING DATA FOR ALL DEVICES
-	for(int d = 0; d <= fl_devices; d++){
+	for(int d = 0; d < fl_devices; d++){
 		for(int b = 0; b < batch_size; b++) {
 	    	delete [] input_data[d][b];
 			delete [] ground_truth[d][b];
