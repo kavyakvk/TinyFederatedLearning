@@ -7,7 +7,7 @@
 #include "FCLayer.h" 
 // #include "FL_model_weights.h"
 #include <cstring>
-#include "Particle.h"
+//#include "Particle.h"
 #include <Arduino.h>
 using namespace std;
 
@@ -237,8 +237,9 @@ void FCLayer::forward (double **input_float, double **output) {
 	for(int b = 0; b < batch_size; b++){
 		for(int j = 0; j < output_size; j++){
 			output[b][j] = 0.0;
+			Serial.println(j);
 			for(int i = 0; i < input_size; i++){
-				output[b][j] = input_float[b][i*input_size+j]*weights[i][j];
+				output[b][j] = input_float[b][i]*weights[i][j];
 			}
 			output[b][j] += bias[j];
 		}
@@ -392,7 +393,8 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 			if(local == true){
 				cout << "EPISODE " << epi << "\n";
 			}else{
-				Serial.print("\tEPISODE %d\n", epi);
+				Serial.print("\tEPISODE");
+        		Serial.println(epi);
 			}
 		}
 		//forward
@@ -404,8 +406,11 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 				cout << "\t\tbias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
 				cout << "\t\toutput before softmax" << output[0][0] << " " << output[0][1] << "\n";
 			}else{
-				Serial.print("\tforward\n\t\t bias loaded %lf %lf output before softmax %lf %lf\n", 
-					model->bias[0], model->bias[1], output[0][0], output[0][1]);
+				Serial.print("\tforward\n\t\t bias loaded");
+				Serial.print(model->bias[0], model->bias[1]);
+				Serial.print(" output before softmax ");
+				Serial.println(output[0][0]);
+				Serial.println(output[0][1]);
 			}
 		}
 
@@ -418,7 +423,9 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 			if(local == true){
 				cout << "\tsoftmax " << output[0][0] << " " << output[0][1] << "\n";
 			}else{
-				Serial.print("\tsoftmax %lf %lf\n", output[0][0], output[0][1]);
+				Serial.print("\tsoftmax");
+				Serial.println(output[0][0]);
+				Serial.println(output[0][1]);
 			}
 		}
 
@@ -429,7 +436,8 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 			if(local == true){
 				cout << "\terror, " << error << "\n";
 			}else{
-				Serial.print("\terror, %lf\n", error);
+				Serial.print("\terror");
+				Serial.println(error);
 			}
 		}
 

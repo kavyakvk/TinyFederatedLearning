@@ -49,7 +49,7 @@ const double quant_scale = 0.04379776492714882;
 const int quant_zero_point = -128;
 const int fl_devices = 1;
 const int batch_size = 1;
-const int local_epochs = 1;
+const int local_epochs = 20;
 const bool real_world = false; // change this if want to use Arducam
 static int current_round = 0;
 static char readEmbeddingsString[input_size * batch_size * (sizeof(double) / sizeof(char))];
@@ -142,6 +142,7 @@ void setup() {
   }
   
   Serial.begin(9600);  // initialize serial communications at 9600 bps
+  pinMode(11, OUTPUT);  // red
 }
 
 // The name of this function is important for Arduino compatibility.
@@ -183,6 +184,7 @@ void loop() {
     }
     Serial.println();
     //  RespondToDetection(error_reporter, person_score, no_person_score);
+
 
   } else{
     current_round += 1;
@@ -257,7 +259,7 @@ void loop() {
       double embeddings_arr[batch_size*input_size];
       int embedding_index = 0;
       for(int i = 0; i < batch_size*input_size; i++){
-        embeddings_arr[embedding_index] = 1.1;//(double)rand()/(RAND_MAX);
+        embeddings_arr[embedding_index] = (double)rand()/(RAND_MAX);
         embedding_index += 1;
       }
 
@@ -313,7 +315,7 @@ void loop() {
       Serial.print("Splitting string for gt\n");
       int gt_arr[batch_size * output_size];
       for(int i = 0; i < output_size*batch_size; i++){
-          gt_arr[i] = 5;
+          gt_arr[i] = (i % 2);
       }
       
       Serial.print("finished Splitting string for gt\n");
@@ -374,7 +376,9 @@ void loop() {
 
       Serial.println("finished loading data into input data and ground truth");
 
-      FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel, true);
+      digitalWrite(11, HIGH);     // red  
+
+      FL_round_simulation(input_data, ground_truth, local_epochs, 0.01, NNmodel, true, false);
 
       Serial.println("finished simulation");
 
