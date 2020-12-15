@@ -392,7 +392,7 @@ void FCLayer::backward (double **output, int **ground_truth,
 	//self.bias -= learning_rate * output_error
 	for(int j = 0; j < output_size; j++){
 		for(int b = 0; b < batch_size; b++) {
-			bias[j] -= learning_rate*output_error[b][j]/batch_size;
+			bias[j] -= learning_rate*output_error_softmax[b][j]/batch_size;
 		}
 	}
 
