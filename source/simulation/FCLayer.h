@@ -7,6 +7,7 @@ class FCLayer {
         double quant_scale;
         double *bias;
         double **weights;
+        double **output_error_softmax;
 
         FCLayer();
         FCLayer (int input_sz, int output_sz, double scale, 

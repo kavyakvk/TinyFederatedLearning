@@ -200,6 +200,12 @@ FCLayer::FCLayer (int input_sz, int output_sz,
 			
 	    }
 	}
+
+	double **output_error_softmax = new double*[batch_size];
+	for(int b = 0; b < batch_size; b++) {
+	    output_error_softmax[b] = new double[output_size];
+	}
+
 	batch_size = batch;
 	quant_zero_point = zero_point;
 	quant_scale = scale;
@@ -291,7 +297,6 @@ double L2(double **weight, int input_size, int output_size, int batch_size){
 void cross_entropy_prime(double *pred, int *real, double *result, int classes){
 	for(int j = 0; j < classes; j++){
 		result[j] = -1.0*real[j]/pred[j];
-		//result[j] = pred[j]-real[j];
 	}
 }
 
@@ -303,10 +308,8 @@ double cross_entropy_loss(double **pred, int **real, int batch_size, int classes
 		for(int j = 0; j < classes; j++){
 			if(real[b][j] == 1 and pred[b][j] < epsilon){
 				result -= real[b][j]*log(epsilon);
-				//cout << "\t\t\tresult epsilon: " << real[b][j]*log(epsilon) << "\n";
 			}else{
 				result -= real[b][j]*log(pred[b][j]);
-				//cout << "\t\t\tresult pred: " << real[b][j]*log(pred[b][j]) << "\n";
 			}
 		}
 	}
@@ -354,21 +357,16 @@ double accuracy(double **pred, int **real, int batch_size, int classes){
 void FCLayer::backward (double **output, int **ground_truth, 
 						double **input_error, double **input_float,
 						double learning_rate, double lambda) {
-	/*
-	https://towardsdatascience.com/neural-networks-from-scratch-easy-vs-hard-b26ddc2e89c7
-	*/
 
-	double **output_error = new double*[batch_size];
+	//double **output_error = new double*[batch_size];
 	double **output_error_softmax = new double*[batch_size];
 
 	for(int b = 0; b < batch_size; b++) {
-	    output_error[b] = new double[output_size];
+	    //output_error[b] = new double[output_size];
 	    output_error_softmax[b] = new double[output_size];
 	    //cross_entropy_prime(output[b], ground_truth[b], output_error[b], output_size);
 	    //softmax_prime(output_error[b], output_error_softmax[b], output_size);
-	    //cout << "\toutput: " << output[b][0] << ", " << output[b][1] << "\n";
 	    combined_ce_softmax_prime(output[b], ground_truth[b], output_error_softmax[b], output_size);
-	    //cout << "\tgradients: " << output_error_softmax[b][0] << ", " << output_error_softmax[b][1] << "\n";
 	}
 
 	for(int b = 0; b < batch_size; b++){
@@ -399,48 +397,20 @@ void FCLayer::backward (double **output, int **ground_truth,
 		    }
 		}
 	}
-/*
-	cout <<"\n\n\nweights_error---input_float\n";
-	assert(batch_size == 1);
-	for(int i = 0; i < input_size; i++) {
-		for(int j = 0; j < output_size; j++){
-			cout << weights_error[i][j] << " ";
-		}
-		cout << "\n";
-		cout << "input: " << input_float[0][i] << "\n";
-	}
-	cout <<"\n\n\n";
 
-	for(int i = 0; i < input_size; i++) {
-		for(int j = 0; j < output_size; j++){
-			cout << weights_error[i][j] << " ";
-		}
-		cout << "\n";
-	}
-	cout <<"\n\n\n";
-*/
-	//cout << "model weight: "<< weights[0][0] << ", " << weights[56][1] << "\n";
 	//self.weights -= learning_rate * weights_error
 	for(int i = 0; i < input_size; ++i) {
 		for(int j = 0; j < output_size; j++){
 			this->weights[i][j] = this->weights[i][j]*(1-learning_rate*lambda/batch_size)-learning_rate*weights_error[i][j];
 		}
 	}
-	//cout << "model weight: "<< weights_error[0][0] << ", " << weights_error[56][1] << "\n";
-
+	
 	//self.bias -= learning_rate * output_error
 	for(int j = 0; j < output_size; j++){
 		for(int b = 0; b < batch_size; b++) {
 			this->bias[j] -= learning_rate*output_error_softmax[b][j]/batch_size;
 		}
 	}
-
-	for(int b = 0; b < batch_size; b++){
-	    delete [] output_error[b];
-	    delete [] output_error_softmax[b];
-	}
-	delete [] output_error;
-	delete [] output_error_softmax;
 }
 
 void FCLayer::cleanup(){
@@ -448,13 +418,15 @@ void FCLayer::cleanup(){
 	for(int i = 0; i < input_size; i++) {
 		delete [] weights[i];
 	}
+	for(int b = 0; b < batch_size; b++){
+	    delete [] output_error_softmax[b];
+	}
+	delete [] output_error_softmax;
 	delete[] weights;
 	delete[] bias;
 }
 
-FCLayer::~FCLayer() { 
-	 
-}
+FCLayer::~FCLayer() { }
 
 void predict(double **input_float, FCLayer *model, double **output, int batch_size, int classes){
 	model->forward(input_float, output);
@@ -470,8 +442,9 @@ void predict(double **input_float, FCLayer *model, double **output, int batch_si
 	}
 }
 
-void FL_round_simulation(double **input_float, int **ground_truth, int local_episodes, 
-						double learning_rate, FCLayer *model, double lambda, bool verbose, bool local){
+void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, int local_episodes, 
+						double learning_rate, FCLayer *model, double lambda, 
+						bool verbose, bool local, bool unquantize){
 	if(verbose == true){
 		if(local == true){
 			cout << "\tstarted sim\n";
@@ -481,6 +454,7 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 	}
 	double **output = new double*[model->batch_size];
 	double **input_error = new double*[model->batch_size];
+	double **input_float = new double*[model->batch_size];
 
 	if(verbose == true){
 		if(local == true){
@@ -499,6 +473,11 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		input_error[b] = new double[model->input_size];
 		for(int i = 0; i < model->input_size; i++){
 			input_error[b][i] = 0.0;
+		}
+		if(unquantize == true){
+			model->dequantize(input_i[b], input_float[b]);
+		}else{
+			input_float[b] = input_f[b];
 		}
 	}
 
@@ -539,45 +518,15 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		}
 
 		//calculate and print error
-		/*
-		cout <<"\n\n\nmodel before backwards";
-		for(int i = 0; i < model->input_size; i++) {
-			for(int j = 0; j < model->output_size; j++){
-				cout << model->weights[i][j] << " ";
-			}
-			cout << "\n";
-		}
-		cout <<"\n\n\n";
-		cout << "\tground truth: " << ground_truth[0][0] << ", " << ground_truth[0][1] << "\n";
-		*/
 		double l2_error = lambda*L2(model->weights, model->input_size, model->output_size, model->batch_size)/2;
 		double error = cross_entropy_loss(output, ground_truth, model->batch_size, model->output_size)
 						+l2_error;
 		double acc = accuracy(output, ground_truth, model->batch_size, model->output_size);
 		cout << "\tlocal episode : " << epi << " error: " << error << " accuracy: " << acc << "\n";
-/*
-		//<< " model weight: "<< model->weights[0][0] << ", " << model->weights[56][1] 
-		if(verbose == true){
-			if(local == true){
-				cout << "\tlocal episode : " << epi << " error: " << error << "\n";
-			}else{
-				//Serial.print("\terror");
-				//Serial.println(error);
-			}
-		}
-*/
+
 		//backward
 		model->backward(output, ground_truth, input_error, input_float, learning_rate, lambda);
-		/*
-		cout <<"\n\n\nmodel after backwards";
-		for(int i = 0; i < model->input_size; i++) {
-			for(int j = 0; j < model->output_size; j++){
-				cout << model->weights[i][j] << " ";
-			}
-			cout << "\n";
-		}
-		cout <<"\n\n\n";
-		*/
+
 		if(verbose == true){
 			if(local == true){
 				cout << "\tbackward\n";
@@ -599,9 +548,13 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 	for(int b = 0; b < model->batch_size; b++) {
 		delete [] input_error[b];
 		delete [] output[b];
+		if(unquantize == true){
+			delete [] input_float[b];
+		}
 	}
 	delete [] input_error;
 	delete [] output;
+	delete [] input_float;
 
 	if(verbose == true){
 		if(local == true){
@@ -610,51 +563,4 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 			//Serial.print("\tdone de-allocation\n");
 		}
 	}
-}
-
-void FL_round_quantize(int **input_data, int **ground_truth, int local_epochs, 
-				double learning_rate, FCLayer *model, double lambda){
-
-	double **input_float = new double*[model->batch_size];
-	double **output = new double*[model->batch_size];
-	double **input_error = new double*[model->batch_size];
-
-	for(int b = 0; b < model->batch_size; b++) {
-		input_float[b] = new double[model->input_size];
-		output[b] = new double[model->output_size];
-		input_error[b] = new double[model->input_size];
-	}
-
-	for(int b = 0; b < model->batch_size; b++) {
-		model->dequantize(input_data[b], input_float[b]);
-	}
-
-	for(int epi = 0; epi <= local_epochs; epi++){
-		//forward
-		model->forward(input_float, output);
-
-		for(int b = 0; b < model->batch_size; b++) {
-			//softmax to get probabilities
-			softmax(output[b], model->output_size);
-		}
-
-		//calculate and print error
-		double l2_error = lambda*L2(model->weights, model->input_size, model->output_size, model->batch_size)/2;
-		double error = cross_entropy_loss(output, ground_truth, model->batch_size, model->output_size)
-						+l2_error;
-
-		//backward
-		model->backward(output, ground_truth, input_error, input_float, learning_rate, l2_error);
-		
-		//reset input_error and output in forward and backward 
-	}
-
-	for(int b = 0; b < model->batch_size; b++) {
-		delete [] input_float[b];
-		delete [] input_error[b];
-		delete [] output[b];
-	}
-	delete [] input_float;
-	delete [] input_error;
-	delete [] output;
 }

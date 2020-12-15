@@ -109,9 +109,7 @@ int main_sim(){
 		        stringstream ss_gt(line_gt);
 
 		        for(int i = 0; i < input_size; i++){
-		        	//cout << epoch << " " << d << " " << b << " " << i << ": ";
 		        	ss_data >> data_val;
-		        	//cout << data_val << " ";
 
 		        	input_data[d][b][i] = data_val;
 		    	}
@@ -129,7 +127,8 @@ int main_sim(){
 		    	assert(sum == 1);
 			}
 			cout << "epoch: " << epoch << " device: " << d << "\n";
-			FL_round_simulation(input_data[d], ground_truth[d], local_episodes, learning_rate, NNmodel, lambda, false, false);
+			FL_round_simulation(input_data[d], nullptr, ground_truth[d], local_episodes, learning_rate, 
+								NNmodel, lambda, false, false, false);
 		}
 		
 		//WEIGHT AVERAGING FOR EACH DEVICE
@@ -268,11 +267,11 @@ int simple_testing_main(){
 						sum += 0;
 					}
 			    }
-			    //cout << gt << " " << ground_truth[d][b][0] << " " << ground_truth[d][b][1] << "\n";
 			    assert(sum == 1);
 			}
 			cout << "epoch: " << epoch << " device: " << d << "\n";
-			FL_round_simulation(input_data[d], ground_truth[d], local_episodes, learning_rate, NNmodel, lambda, false, false);
+			FL_round_simulation(input_data[d], nullptr, ground_truth[d], local_episodes, learning_rate, 
+				NNmodel, lambda, false, false, false);
 		}
 		//WEIGHT AVERAGING FOR EACH DEVICE
 		for(int i = 0; i < input_size; i++){
@@ -305,34 +304,6 @@ int simple_testing_main(){
 			output[b][j] = 0.0;
 		}
 	}
-
-	cout <<"\n\n\n";
-	int d = 0;
-	for(int b = 0; b < batch_size; b++) {
-		// Extract the line in the file
-		for(int i = 0; i < input_size; i++){
-			//int a=rand()%2;
-			input_data[d][b][i] = (double)rand()/(RAND_MAX);//a*1.0;
-			cout << input_data[d][b][i] << " ";
-	    }
-	    cout <<":\n";
-	}
-	predict(input_data[d], &(devices[d]), output, batch_size, output_size);
-	for(int b = 0; b < batch_size; b++) {
-	    for (int j = 0; j < output_size; j++){
-			cout << output[b][j] << " ";
-	    }
-	    cout <<"\n";
-	}
-
-	cout <<"\n\n\n";
-	for(int i = 0; i < input_size; i++) {
-		for(int j = 0; j < output_size; j++){
-			cout << devices[0].weights[i][j] << " ";
-		}
-		cout << "\n";
-	}
-	cout <<"\n\n\n";
 
 	//DE-ALLOCATE MEMORY STORING SERVER WEIGHTS AND BIAS
 	for(int i = 0; i < input_size; i++) {
