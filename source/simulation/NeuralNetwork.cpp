@@ -183,9 +183,9 @@ FCLayer::FCLayer (int input_sz, int output_sz,
 	}
 
 	weights = new double*[input_size];
-	for(int i = 0; i < input_size; ++i) {
-	    weights[i] = new double[output_size];
-	    for(int j = 0; j < output_size; j++){
+	for(int i = 0; i < input_size; i++) {
+		weights[i] = new double[output_size];
+		for(int j = 0; j < output_size; j++){
 	    	if(default_weight){
 	    		//initial_model_weights was 256x2 but now flattened
 	    		//input_size = 256, output_size = 2
@@ -203,26 +203,14 @@ FCLayer::FCLayer (int input_sz, int output_sz,
 
 
 void FCLayer::set_weights_bias(double **new_weights, double *new_bias){
-	// Deallocate weights
-	for(int i = 0; i < input_size; i++) {
-		delete [] weights[i];
-	}
-	delete[] weights;
-
-	// Reallocate weights
-	weights = new double*[input_size];
+	// Set weights
 	for(int i = 0; i < input_size; ++i) {
-		weights[i] = new double[output_size];
 		for (int j = 0; j < output_size; ++j){
 			weights[i][j] = new_weights[i][j];
 		}		
 	}
 
-	// Deallocate bias
-	delete[] bias;
-
-	// Reallocate bias
-	bias = new double[output_size];
+	// Set bias
 	for(int j = 0; j < output_size; j++) {
 		bias[j] = new_bias[j];
 	}
@@ -230,12 +218,26 @@ void FCLayer::set_weights_bias(double **new_weights, double *new_bias){
 
 void softmax(double *input_output_data, int classes){
 	double sum = 0;
-	for(int i = 0; i < classes; i++){
-		input_output_data[i] = exp(input_output_data[i]);
-		sum += input_output_data[i];
+
+	for(int j = 0; j < classes; j++){
+		input_output_data[j] = exp(input_output_data[j]);
+		sum += input_output_data[j];
 	}
-	for(int i = 0; i < classes; i++){
-		input_output_data[i] = input_output_data[i]/sum;
+	for(int j = 0; j < classes; j++){
+		input_output_data[j] = input_output_data[j]/sum;
+	}
+}
+
+void softmax_prime(double *pred, double *result, int classes){
+	for(int a = 0; a < classes; a++){
+		result[a] = 0;
+		for(int b = 0; b < classes; b++){
+			if(a == b){
+				result[a] += pred[a]*(1-pred[a]);
+			}else{
+				result[a] += -1*pred[a]*pred[b];
+			}
+		}
 	}
 }
 
@@ -258,18 +260,38 @@ void FCLayer::forward (double **input_float, double **output) {
 		for(int j = 0; j < output_size; j++){
 			output[b][j] = 0.0;
 			for(int i = 0; i < input_size; i++){
-				output[b][j] = input_float[b][i]*weights[i][j];
+				output[b][j] += input_float[b][i]*weights[i][j];
 			}
 			output[b][j] += bias[j];
 		}
+		//softmax to get probabilities
+		softmax(output[b], output_size);
 	}
 }
 
-void cross_entropy_prime(double *pred, double *real, double *result, int classes){
-	// pred and real are a [# classes] sized array 
-	for(int i = 0; i < classes; i++){
-		result[i] += (pred[i]-real[i]);
+void cross_entropy_prime(double *pred, int *real, double *result, int classes){
+	for(int j = 0; j < classes; j++){
+		result[j] = -1.0*real[j]/pred[j];
+		/*
+		if(real[j] > 0){
+			result[j] = pred[j]-1;
+		}else{
+			result[j] = pred[j];
+		}
+		*/
 	}
+}
+
+double cross_entropy_loss(double **pred, int **real, int batch_size, int classes){
+	double result = 0.0;
+	double epsilon = 0.0000001;
+
+	for(int b = 0; b < batch_size; b++){
+		for(int j = 0; j < classes; j++){
+			result -= real[b][j]*log(pred[b][j]+epsilon);
+		}
+	}
+	return result/(classes*batch_size);
 }
 
 void mse_prime(double *pred, int *real, double *result, int classes){
@@ -295,7 +317,7 @@ double accuracy(double **pred, int **real, int batch_size, int classes){
 
 	for(int b = 0; b < batch_size; b++){
 		for(int j = 0; j < classes; j++){
-			if(pred[b][j]-real[b][j] == 0){
+			if((pred[b][j] >= 0.5 && real[b][j] == 1)||(pred[b][j] < 0.5 && real[b][j] == 0)){
 				correct += 1;
 			}
 		}
@@ -311,9 +333,14 @@ void FCLayer::backward (double **output, int **ground_truth,
 	*/
 
 	double **output_error = new double*[batch_size];
+	double **output_error_softmax = new double*[batch_size];
+
 	for(int b = 0; b < batch_size; b++) {
 	    output_error[b] = new double[output_size];
-	    mse_prime(output[b], ground_truth[b], output_error[b], output_size);
+	    output_error_softmax[b] = new double[output_size];
+	    cross_entropy_prime(output[b], ground_truth[b], output_error[b], output_size);
+	    softmax_prime(output_error[b], output_error_softmax[b], output_size);
+	    //softmax_prime(output[b], output_error_softmax[b], output_size);
 	}
 
 	for(int b = 0; b < batch_size; b++){
@@ -322,7 +349,7 @@ void FCLayer::backward (double **output, int **ground_truth,
 	    for(int i = 0; i < input_size; i++) {
 	    	input_error[b][i] = 0.0;
 		    for(int j = 0; j < output_size; j++){
-				input_error[b][i] += output_error[b][j]*weights[i][j]/batch_size;
+				input_error[b][i] += output_error_softmax[b][j]*weights[i][j]/batch_size;
 		    }
 		}
 	}
@@ -340,28 +367,41 @@ void FCLayer::backward (double **output, int **ground_truth,
 		// input_sizexoutput_size = input_sizexbatch_size dot batch_sizexoutput_size
 		for(int j = 0; j < output_size; j++){
 			for(int b = 0; b < batch_size; b++){
-				weights_error[i][j] += input_float[b][i]*output_error[b][j]/batch_size;
+				weights_error[i][j] += input_float[b][i]*output_error_softmax[b][j]/batch_size;
 		    }
 		}
 	}
-
+/*
+	for(int i = 0; i < input_size; i++) {
+		for(int j = 0; j < output_size; j++){
+			cout << weights_error[i][j] << " ";
+		}
+		cout << "\n";
+	}
+	cout <<"\n\n\n";
+*/
+	//cout << "model weight: "<< weights[0][0] << ", " << weights[56][1] << "\n";
 	//self.weights -= learning_rate * weights_error
 	for(int i = 0; i < input_size; ++i) {
 		for(int j = 0; j < output_size; j++){
 			weights[i][j] -= learning_rate*weights_error[i][j];
 		}
 	}
+	//cout << "model weight: "<< weights_error[0][0] << ", " << weights_error[56][1] << "\n";
+
 	//self.bias -= learning_rate * output_error
 	for(int j = 0; j < output_size; j++){
 		for(int b = 0; b < batch_size; b++) {
-			bias[j] -= learning_rate*output_error[b][j]/batch_size;
+			bias[j] -= learning_rate*output_error_softmax[b][j]/batch_size;
 		}
 	}
 
 	for(int b = 0; b < batch_size; b++){
 	    delete [] output_error[b];
+	    delete [] output_error_softmax[b];
 	}
 	delete [] output_error;
+	delete [] output_error_softmax;
 }
 
 void FCLayer::cleanup(){
@@ -375,6 +415,20 @@ void FCLayer::cleanup(){
 
 FCLayer::~FCLayer() { 
 	 
+}
+
+void predict(double **input_float, FCLayer *model, double **output, int batch_size, int classes){
+	model->forward(input_float, output);
+
+	for(int b = 0; b < batch_size; b++){
+		for(int j = 0; j < classes; j++){
+			if(output[b][j] >= 0.5){
+				output[b][j] = 1;
+			}else{
+				output[b][j] = 0;
+			}
+		}
+	}
 }
 
 void FL_round_simulation(double **input_float, int **ground_truth, int local_episodes, 
@@ -424,32 +478,17 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		if(verbose == true){
 			if(local == true){
 				cout << "EPISODE " << epi << "\n";
+				cout << "\tforward\n";
+				cout << "\t\tbias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
 			}else{
 				//Serial.print("\tEPISODE");
         		//Serial.println(epi);
+        		//Serial.print("\tforward\n\t\t bias loaded");
+				//Serial.print(model->bias[0], model->bias[1]);
 			}
 		}
 		//forward
 		model->forward(input_float, output);
-
-		if(verbose == true){
-			if(local == true){
-				cout << "\tforward\n";
-				cout << "\t\tbias loaded " << model->bias[0] << " " << model->bias[1] << "\n";
-				cout << "\t\toutput before softmax" << output[0][0] << " " << output[0][1] << "\n";
-			}else{
-				//Serial.print("\tforward\n\t\t bias loaded");
-				//Serial.print(model->bias[0], model->bias[1]);
-				//Serial.print(" output before softmax ");
-				//Serial.println(output[0][0]);
-				//Serial.println(output[0][1]);
-			}
-		}
-
-		for(int b = 0; b < model->batch_size; b++) {
-			//softmax to get probabilities
-			softmax(output[b], model->output_size);
-		}
 
 		if(verbose == true){
 			if(local == true){
@@ -462,9 +501,11 @@ void FL_round_simulation(double **input_float, int **ground_truth, int local_epi
 		}
 
 		//calculate and print error
-		double error = mse(output, ground_truth, model->batch_size, model->output_size);
+		double error = cross_entropy_loss(output, ground_truth, model->batch_size, model->output_size);
 		double acc = accuracy(output, ground_truth, model->batch_size, model->output_size);
 		cout << "\tlocal episode : " << epi << " error: " << error << " accuracy: " << acc << "\n";
+
+		//<< " model weight: "<< model->weights[0][0] << ", " << model->weights[56][1] 
 		if(verbose == true){
 			if(local == true){
 				cout << "\tlocal episode : " << epi << " error: " << error << "\n";

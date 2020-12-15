@@ -16,20 +16,20 @@
 
 using namespace std;
 
-int main(int argc, char** argv){
+int main_sim(int argc, char** argv){
 	int input_size = 256;
 	int output_size = 2;
 	double quant_scale = 0.04379776492714882;
 	int quant_zero_point = -128;
 	int fl_devices = 1;//stoi(argv[1]); //number of devices in the simulation
-	int local_episodes = 2;//stoi(argv[2]); //number of local epochs each device trains for
-	int data_per_device = 3;//stoi(argv[3]); //number of examples per device
-	int epoch_data_per_device = 9;//stoi(argv[4]); // number of examples during a given epoch
-	int batch_size = 3;//stoi(argv[5]); //batch size for the devices, epoch_data_per_device / batch_size = an int
-	int epochs = 20;//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
-	int data_per_round = data_per_device / epochs;
+	int local_episodes = 1;//stoi(argv[2]); //number of local epochs each device trains for
+	//int data_per_device = 3;//stoi(argv[3]); //number of examples per device
+	//int epoch_data_per_device = 9;//stoi(argv[4]); // number of examples during a given epoch
+	int batch_size = 4;//stoi(argv[5]); //batch size for the devices, epoch_data_per_device / batch_size = an int
+	int epochs = 100;//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+	//int data_per_round = data_per_device / epochs;
 
-	assert(1740 >= epochs*fl_devices*data_per_device);
+	assert(1740 >= epochs*fl_devices*batch_size);
 
 	/*
 		TESTING VALUES:
@@ -86,6 +86,7 @@ int main(int argc, char** argv){
 
 	double data_val;
 	int gt_val;
+	double learning_rate = 0.00001;
 	//throw out first line if CSV
 	//getline(data_file, line_data);
 	//getline(gt_file, line_gt);
@@ -108,20 +109,27 @@ int main(int argc, char** argv){
 		        for(int i = 0; i < input_size; i++){
 		        	//cout << epoch << " " << d << " " << b << " " << i << ": ";
 		        	ss_data >> data_val;
-		        	//cout << data_val << "\n";
+		        	//cout << data_val << " ";
 
 		        	input_data[d][b][i] = data_val;
 		    	}
+		    	ss_gt >> gt_val;
+		    	int sum = 0;
 		    	for (int j = 0; j < output_size; j++){
-		        	ss_gt >> gt_val;
-
-		        	ground_truth[d][b][j] = gt_val;
+		        	if(j == gt_val){
+		        		ground_truth[d][b][j] = 1;
+		        		sum += 1;
+		        	}else{
+		        		ground_truth[d][b][j] = 0;
+		        		sum += 0;
+		        	}
 		    	}
+		    	assert(sum == 1);
 			}
 			cout << "epoch: " << epoch << " device: " << d << "\n";
-			FL_round_simulation(input_data[d], ground_truth[d], local_episodes, 0.0001, NNmodel, false, false);
+			FL_round_simulation(input_data[d], ground_truth[d], local_episodes, learning_rate, NNmodel, false, false);
 		}
-
+/*
 		//WEIGHT AVERAGING FOR EACH DEVICE
 		for(int i = 0; i < input_size; i++){
 			for (int j = 0; j < output_size; j++){
@@ -143,6 +151,7 @@ int main(int argc, char** argv){
 		for(int d = 0; d < fl_devices; d++){
 			devices[d].set_weights_bias(server_weights, server_bias);
 		}
+*/
 	}
 
 	data_file.close();
@@ -172,4 +181,161 @@ int main(int argc, char** argv){
 	}
 	delete [] input_data;
 	delete [] ground_truth;
+	return 0;
+}
+
+//simple_testing_
+int main(int argc, char** argv){
+	int input_size = 6;
+	int output_size = 2;
+	double quant_scale = 0.04379776492714882;
+	int quant_zero_point = -128;
+	int fl_devices = 1;//stoi(argv[1]); //number of devices in the simulation
+	int local_episodes = 1;//stoi(argv[2]); //number of local epochs each device trains for
+	int batch_size = 10;//stoi(argv[5]); //batch size for the devices, epoch_data_per_device / batch_size = an int
+	int epochs = 1000;//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+
+	//CREATE DEVICES
+	FCLayer devices[fl_devices];
+	for(int d = 0; d < fl_devices; d++){
+		devices[d] = FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, false);
+	}
+
+	//ALLOCATE MEMORY TO STORE DATA FOR ALL DEVICES
+	double ***input_data = new double**[fl_devices];
+	int ***ground_truth = new int**[fl_devices];
+	for(int d = 0; d < fl_devices; d++){
+		input_data[d] = new double*[batch_size];
+	 	ground_truth[d] = new int*[batch_size];
+	 	for(int b = 0; b < batch_size; b++) {
+			input_data[d][b] = new double[input_size];
+			ground_truth[d][b] = new int[output_size];
+		    for(int i = 0; i < input_size; i++){
+				input_data[d][b][i] = 0.0;
+		    }
+		    for (int j = 0; j < output_size; j++){
+				ground_truth[d][b][j] = 0;
+		    }
+		}
+	}
+
+	//ALLOCATE MEMORY FOR THE SERVER WEIGHTS AND BIAS
+	double **server_weights = new double*[input_size];
+	double *server_bias = new double[output_size];
+	for(int i = 0; i < input_size; i++){
+		server_weights[i] = new double[output_size];
+		for (int j = 0; j < output_size; j++){
+			server_weights[i][j] = 0.0;
+			server_bias[j] = 0.0;
+		}
+	}
+
+	double learning_rate = 0.001;
+
+	//FOR EPOCHS
+	for(int epoch = 0; epoch < epochs; epoch++){
+		//TRAIN FOR EACH DEVICE
+		for(int d = 0; d < fl_devices; d++){
+			FCLayer* NNmodel = &(devices[d]);
+
+			for(int b = 0; b < batch_size; b++) {
+				// Extract the line in the file
+				for(int i = 0; i < input_size; i++){
+					int a=rand()%2;
+					input_data[d][b][i] = a*1.0;
+			    }
+
+			    int gt = -1;
+			    int sum = 0;
+			    if(5*input_data[d][b][0]+2*input_data[d][b][1]-4*input_data[d][b][2]
+	    			-5*input_data[d][b][3]-2*input_data[d][b][4]+4*input_data[d][b][5] >= 0){
+			    	gt = 1;
+			    }else{
+			    	gt = 0;
+			    }
+
+			    for (int j = 0; j < output_size; j++){
+					if(j == gt){
+						ground_truth[d][b][j] = 1;
+						sum += 1;
+					}
+					else{
+						ground_truth[d][b][j] = 0;
+						sum += 0;
+					}
+			    }
+			    //cout << gt << " " << ground_truth[d][b][0] << " " << ground_truth[d][b][1] << "\n";
+			    assert(sum == 1);
+			}
+			cout << "epoch: " << epoch << " device: " << d << "\n";
+			FL_round_simulation(input_data[d], ground_truth[d], local_episodes, learning_rate, NNmodel, false, false);
+		}
+	}
+
+	double **output = new double*[batch_size];
+	for(int b = 0; b < batch_size; b++) {
+		output[b] = new double[output_size];
+		for(int j = 0; j < output_size; j++){
+			output[b][j] = 0.0;
+		}
+	}
+
+	cout <<"\n\n\n";
+	int d = 0;
+	for(int b = 0; b < batch_size; b++) {
+		// Extract the line in the file
+		for(int i = 0; i < input_size; i++){
+			int a=rand()%2;
+			input_data[d][b][i] = a*1.0;
+			cout << input_data[d][b][i] << " ";
+	    }
+	    cout <<":\n";
+	}
+	predict(input_data[d], &(devices[d]), output, batch_size, output_size);
+	for(int b = 0; b < batch_size; b++) {
+	    for (int j = 0; j < output_size; j++){
+			cout << output[b][j] << " ";
+	    }
+	    cout <<"\n";
+	}
+
+	cout <<"\n\n\n";
+	for(int i = 0; i < input_size; i++) {
+		for(int j = 0; j < output_size; j++){
+			cout << devices[0].weights[i][j] << " ";
+		}
+		cout << "\n";
+	}
+	cout <<"\n\n\n";
+
+	//DE-ALLOCATE MEMORY STORING SERVER WEIGHTS AND BIAS
+	for(int i = 0; i < input_size; i++) {
+		delete [] server_weights[i];
+	}
+	delete[] server_weights;
+	delete[] server_bias;
+
+	for(int b = 0; b < batch_size; b++) {
+		delete [] output[b];
+	}
+	delete [] output;
+
+	//DE-ALLOCATE MEMORY STORING DEVICES
+	for(int d = 0; d < fl_devices; d++){
+		cout << fl_devices << "\n";
+		devices[d].cleanup();
+	}
+
+	//DE-ALLOCATE MEMORY STORING DATA FOR ALL DEVICES
+	for(int d = 0; d < fl_devices; d++){
+		for(int b = 0; b < batch_size; b++) {
+	    	delete [] input_data[d][b];
+			delete [] ground_truth[d][b];
+		}
+		delete [] input_data[d];
+		delete [] ground_truth[d];
+	}
+	delete [] input_data;
+	delete [] ground_truth;
+	//return 1;
 }
