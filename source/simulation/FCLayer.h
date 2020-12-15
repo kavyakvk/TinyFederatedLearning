@@ -14,7 +14,7 @@ class FCLayer {
         void forward (double **input_float, double **output);
         void backward (double **output, int **ground_truth, 
                             double **input_error, double **input_float,
-                            double learning_rate); 
+                            double learning_rate, double lambda); 
         void dequantize(int *input_data, double *input_float);
         void cleanup();
         ~FCLayer();
