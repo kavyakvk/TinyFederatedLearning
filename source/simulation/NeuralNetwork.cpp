@@ -218,9 +218,14 @@ void FCLayer::set_weights_bias(double **new_weights, double *new_bias){
 
 void softmax(double *input_output_data, int classes){
 	double sum = 0;
-
+	double max = -10000.0;
 	for(int j = 0; j < classes; j++){
-		input_output_data[j] = exp(input_output_data[j]);
+		if(input_output_data[j] > max){
+			max = input_output_data[j];
+		}
+	}
+	for(int j = 0; j < classes; j++){
+		input_output_data[j] = exp(input_output_data[j]-max);
 		sum += input_output_data[j];
 	}
 	for(int j = 0; j < classes; j++){
@@ -272,13 +277,7 @@ void FCLayer::forward (double **input_float, double **output) {
 void cross_entropy_prime(double *pred, int *real, double *result, int classes){
 	for(int j = 0; j < classes; j++){
 		result[j] = -1.0*real[j]/pred[j];
-		/*
-		if(real[j] > 0){
-			result[j] = pred[j]-1;
-		}else{
-			result[j] = pred[j];
-		}
-		*/
+		//result[j] = pred[j]-real[j];
 	}
 }
 
@@ -291,7 +290,7 @@ double cross_entropy_loss(double **pred, int **real, int batch_size, int classes
 			result -= real[b][j]*log(pred[b][j]+epsilon);
 		}
 	}
-	return result/(classes*batch_size);
+	return result/(batch_size);
 }
 
 void mse_prime(double *pred, int *real, double *result, int classes){

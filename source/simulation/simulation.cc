@@ -16,7 +16,8 @@
 
 using namespace std;
 
-int main_sim(int argc, char** argv){
+int main_sim(){
+	//int argc, char** argv
 	int input_size = 256;
 	int output_size = 2;
 	double quant_scale = 0.04379776492714882;
@@ -185,7 +186,8 @@ int main_sim(int argc, char** argv){
 }
 
 //simple_testing_
-int main(int argc, char** argv){
+int simple_testing_main(){
+	//int argc, char** argv
 	int input_size = 6;
 	int output_size = 2;
 	double quant_scale = 0.04379776492714882;
@@ -337,5 +339,10 @@ int main(int argc, char** argv){
 	}
 	delete [] input_data;
 	delete [] ground_truth;
-	//return 1;
+	return 1;
+}
+
+int main(){
+	//int i = main_sim();
+	int j = simple_testing_main();
 }
