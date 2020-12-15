@@ -55,20 +55,20 @@ def main():
 	init_weights = pickle.load(open('../../dl/pickle_initial_model_weights.p', 'rb'))
 	init_bias = [0.08060145, -0.08060154];			# bias (initial)
 	init_weights.extend(init_bias)					# extend bias to end of 1d weights array
-	init_weights_str = (",".join(map(str, init_weights)) + "\n").encode()
-	print(init_weights_str[-50:])		
+	init_weights_str = (",".join(map(str, init_weights))[:1000] + "\n").encode()
+	print(init_weights_str)		
 	# print(len(init_weights))		# 256*2 + 2
 	# print(len(init_weights_str))
 
 
 	# Setup connection to Arduino
-	port = '/dev/cu.usbmodem142301' # change this to what the Arduino Port is
-	ard = serial.Serial(port,9600,timeout=5)
-	time.sleep(5) # wait for Arduino
+	# port = '/dev/cu.usbmodem142301' # change this to what the Arduino Port is
+	# ard = serial.Serial(port,9600,timeout=5)
+	time.sleep(3) # wait for Arduino
 
 	# For one round
 	i = 0
-	while (i < 1):
+	while (i < 0):
 		print('Beginning of a new round')
 
 		# Serial write section
@@ -97,20 +97,16 @@ def main():
 		# print(f"Mac: received {msg}")
 
 		# Send initial weights
-		ard.write(init_weights_str[:3000])
+		ard.write(init_weights_str)
 		# ard.write("0.63,0.68,0.12,0.12,0.12,-0.1\n".encode())
-		time.sleep(5)
 		print("Mac: sent initial weights and bias")
-		time.sleep(9)
+		time.sleep(10)
 
-		# Read Arduino's response
-		msg = ard.read(ard.inWaiting()) # read all characters in buffer
-		print(f"Mac: received {msg}")
-		time.sleep(5)
-
-		# Read Arduino's response
-		msg = ard.read(ard.inWaiting()) # read all characters in buffer
-		print(f"Mac: received {msg}")
+		for i in range(5):
+			# Read Arduino's response
+			msg = ard.read(ard.inWaiting()) # read all characters in buffer
+			print(f"Mac: received {msg}")
+			time.sleep(10)
 
 
 		i = i + 1
