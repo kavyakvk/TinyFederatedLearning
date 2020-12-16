@@ -16,7 +16,7 @@
 
 using namespace std;
 
-int main_sim(bool perf, bool tf, bool custom, 
+int main_sim(bool perf, bool tf, bool custom, bool pretrained,
 			int fl_devices, int local_episodes, int batch_size, int epochs){
 	//int argc, char** argv
 	int input_size = -1;
@@ -62,7 +62,7 @@ int main_sim(bool perf, bool tf, bool custom,
 	//CREATE DEVICES
 	FCLayer devices[fl_devices];
 	for(int d = 0; d < fl_devices; d++){
-		devices[d] = FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, false);
+		devices[d] = FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, pretrained);
 	}
 
 	//ALLOCATE MEMORY TO STORE DATA FOR ALL DEVICES 
@@ -450,24 +450,24 @@ int main_command_line(int argc, char **argv){
 	cout << "============================\n";
 	cout << "fl_devices " << fl_devices << " local_episodes " << local_episodes << " batch_size " << batch_size << "\n";
 	if(stoi(argv[1]) == 0){
-		int i = main_sim(true, false, false, fl_devices, local_episodes, batch_size, epochs);
+		int i = main_sim(true, false, false, false, fl_devices, local_episodes, batch_size, epochs);
 	}else if(stoi(argv[1]) == 1){
-		int i = main_sim(false, true, false, fl_devices, local_episodes, batch_size, epochs);
+		int i = main_sim(false, true, false, false, fl_devices, local_episodes, batch_size, epochs);
 	}else{
-		int i = main_sim(false, false, true, fl_devices, local_episodes, batch_size, epochs);
+		int i = main_sim(false, false, true, false, fl_devices, local_episodes, batch_size, epochs);
 	}
 	//int j = simple_testing_main();
 	return 1;
 }
 
-int main(int argc, char **argv){
+int main_local_episodes(int argc, char **argv){
 	//x axes: # devices, # local episodes, batch size
 	int output_size = 2;
 
 	srand (time(NULL));
 
 	cout << "EXPERIMENT: LOCAL EPISODES\n"; 
-	for(int a = 1; a < 11; a++){
+	for(int a = 1; a < 7; a++){
 		int fl_devices = 2; //number of devices in the simulation
 		int local_episodes = a; //number of local epochs each device trains for
 		int batch_size = 20; //batch size for the devices, epoch_data_per_device / batch_size = an int
@@ -477,10 +477,110 @@ int main(int argc, char **argv){
 		int i = 0;
 		for(int trials = 0; trials < 20; trials++){
 			cout << "TRIAL " << trials << "\n";
-			i = main_sim(false, true, false, fl_devices, local_episodes, batch_size, epochs);
+			i = main_sim(false, true, false, false, fl_devices, local_episodes, batch_size, epochs);
 			cout << "END TRIAL\n";
 		}
 	}
+	//int j = simple_testing_main();
+	return 1;
+}
+
+int main_batch(int argc, char **argv){
+	//x axes: # devices, # local episodes, batch size
+	int output_size = 2;
+
+	srand (time(NULL));
+
+	cout << "EXPERIMENT: LOCAL EPISODES\n"; 
+	for(int a = 1; a < 4;){
+		int fl_devices = 2; //number of devices in the simulation
+		int local_episodes = 5; //number of local epochs each device trains for
+		int batch_size = a; //batch size for the devices, epoch_data_per_device / batch_size = an int
+		int epochs = 8000/(batch_size*fl_devices);//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+		cout << "============================\n";
+		cout << "START: fl_devices " << fl_devices << " local_episodes " << local_episodes << " batch_size " << batch_size << "\n";
+		int i = 0;
+		for(int trials = 0; trials < 20; trials++){
+			cout << "TRIAL " << trials << "\n";
+			i = main_sim(false, true, false, false, fl_devices, local_episodes, batch_size, epochs);
+			cout << "END TRIAL\n";
+		}
+		if(a == 1){
+			a = 10;
+		}else{
+			a += 10;
+		}
+
+	}
+	//int j = simple_testing_main();
+	return 1;
+}
+
+int main(int argc, char **argv){
+	//baseline transfer learning with random weights versus baseline 
+	int output_size = 2;
+
+	srand (time(NULL));
+
+	cout << "EXPERIMENT: BASELINE LEARNING WITH RANDOM WEIGHTS\n"; 
+	int fl_devices = 1; //number of devices in the simulation
+	int local_episodes = 5; //number of local epochs each device trains for
+	int batch_size = 20; //batch size for the devices, epoch_data_per_device / batch_size = an int
+	int epochs = 8000/(batch_size*fl_devices);//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+	cout << "============================\n";
+	cout << "START: fl_devices " << fl_devices << " local_episodes " << local_episodes << " batch_size " << batch_size << "\n";
+	int i = 0;
+	for(int trials = 0; trials < 10; trials++){
+		cout << "TRIAL " << trials << "\n";
+		i = main_sim(false, true, false, false, fl_devices, local_episodes, batch_size, epochs);
+		cout << "END TRIAL\n";
+	}
+
+	cout << "EXPERIMENT: FL LEARNING WITH RANDOM WEIGHTS\n"; 
+	fl_devices = 2; //number of devices in the simulation
+	local_episodes = 5; //number of local epochs each device trains for
+	batch_size = 20; //batch size for the devices, epoch_data_per_device / batch_size = an int
+	epochs = 8000/(batch_size*fl_devices);//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+	
+	cout << "============================\n";
+	cout << "START: fl_devices " << fl_devices << " local_episodes " << local_episodes << " batch_size " << batch_size << "\n";
+	i = 0;
+	for(int trials = 0; trials < 10; trials++){
+		cout << "TRIAL " << trials << "\n";
+		i = main_sim(false, true, false, false, fl_devices, local_episodes, batch_size, epochs);
+		cout << "END TRIAL\n";
+	}
+	/*
+	cout << "EXPERIMENT: BASELINE LEARNING WITH PRETRAINED WEIGHTS\n"; 
+	fl_devices = 1; //number of devices in the simulation
+	local_episodes = 5; //number of local epochs each device trains for
+	batch_size = 20; //batch size for the devices, epoch_data_per_device / batch_size = an int
+	epochs = 8000/(batch_size*fl_devices);//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+	
+	cout << "============================\n";
+	cout << "START: fl_devices " << fl_devices << " local_episodes " << local_episodes << " batch_size " << batch_size << "\n";
+	i = 0;
+	for(int trials = 0; trials < 10; trials++){
+		cout << "TRIAL " << trials << "\n";
+		i = main_sim(false, true, false, true, fl_devices, local_episodes, batch_size, epochs);
+		cout << "END TRIAL\n";
+	}
+
+	cout << "EXPERIMENT: FL LEARNING WITH PRETRAINED WEIGHTS\n"; 
+	fl_devices = 2; //number of devices in the simulation
+	local_episodes = 5; //number of local epochs each device trains for
+	batch_size = 20; //batch size for the devices, epoch_data_per_device / batch_size = an int
+	epochs = 8000/(batch_size*fl_devices);//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+	
+	cout << "============================\n";
+	cout << "START: fl_devices " << fl_devices << " local_episodes " << local_episodes << " batch_size " << batch_size << "\n";
+	i = 0;
+	for(int trials = 0; trials < 10; trials++){
+		cout << "TRIAL " << trials << "\n";
+		i = main_sim(false, true, false, true, fl_devices, local_episodes, batch_size, epochs);
+		cout << "END TRIAL\n";
+	}
+	*/
 	//int j = simple_testing_main();
 	return 1;
 }
