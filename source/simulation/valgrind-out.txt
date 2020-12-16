@@ -1,1037 +1,831 @@
-==85379== Memcheck, a memory error detector
-==85379== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==85379== Using Valgrind-3.17.0.GIT-lbmacos-adaae87a41-20201121 and LibVEX; rerun with -h for copyright info
-==85379== Command: ./simulation
-==85379== Parent PID: 44703
-==85379== 
---85379-- 
---85379-- Valgrind options:
---85379--    --leak-check=full
---85379--    --show-leak-kinds=all
---85379--    --track-origins=yes
---85379--    --verbose
---85379--    --log-file=valgrind-out.txt
---85379-- Output from sysctl({CTL_KERN,KERN_VERSION}):
---85379--   Darwin Kernel Version 18.7.0: Thu Jun 18 20:50:10 PDT 2020; root:xnu-4903.278.43~1/RELEASE_X86_64
---85379-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand
---85379-- Page sizes: currently 4096, max supported 4096
---85379-- Valgrind library directory: /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind
---85379-- ./simulation (rx at 0x100000000, rw at 0x10000d000)
---85379--    reading syms   from primary file (50 1196)
---85379--    dSYM= ./simulation.dSYM/Contents/Resources/DWARF/simulation
---85379--    reading dwarf3 from dsyms file
---85379-- /usr/lib/dyld (rx at 0x10001e000, rw at 0x100089000)
---85379--    reading syms   from primary file (5 2133)
---85379-- Scheduler: using generic scheduler lock implementation.
---85379-- Reading suppressions file: /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/default.supp
-==85379== embedded gdbserver: reading from /var/folders/fh/2kh5624x67xg8bzs6xjpqlsc0000gn/T//vgdb-pipe-from-vgdb-to-85379-by-kavyakopparapu-on-???
-==85379== embedded gdbserver: writing to   /var/folders/fh/2kh5624x67xg8bzs6xjpqlsc0000gn/T//vgdb-pipe-to-vgdb-from-85379-by-kavyakopparapu-on-???
-==85379== embedded gdbserver: shared mem   /var/folders/fh/2kh5624x67xg8bzs6xjpqlsc0000gn/T//vgdb-pipe-shared-mem-vgdb-85379-by-kavyakopparapu-on-???
-==85379== 
-==85379== TO CONTROL THIS PROCESS USING vgdb (which you probably
-==85379== don't want to do, unless you know exactly what you're doing,
-==85379== or are doing some strange experiment):
-==85379==   /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/../../bin/vgdb --pid=85379 ...command...
-==85379== 
-==85379== TO DEBUG THIS PROCESS USING GDB: start GDB like this
-==85379==   /path/to/gdb ./simulation
-==85379== and then give GDB the following command
-==85379==   target remote | /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/../../bin/vgdb --pid=85379
-==85379== --pid is optional if only one valgrind process is running
-==85379== 
---85379-- REDIR: 0x10005f120 (dyld:strcmp) redirected to 0x258057910 (???)
---85379-- REDIR: 0x1000595f6 (dyld:arc4random) redirected to 0x2580579ae (???)
---85379-- REDIR: 0x10005e500 (dyld:strlen) redirected to 0x2580578df (???)
---85379-- REDIR: 0x10005f420 (dyld:strcpy) redirected to 0x25805792c (???)
---85379-- REDIR: 0x10005c6f0 (dyld:strcat) redirected to 0x2580578f0 (???)
---85379-- REDIR: 0x10005e2f0 (dyld:strlcat) redirected to 0x258057949 (???)
---85379-- /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_core-amd64-darwin.so (rx at 0x1000e9000, rw at 0x1000ed000)
---85379--    reading syms   from primary file (3 52)
---85379--    dSYM= /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_core-amd64-darwin.so.dSYM/Contents/Resources/DWARF/vgpreload_core-amd64-darwin.so
---85379-- /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so (rx at 0x1000f0000, rw at 0x1000f7000)
---85379--    reading syms   from primary file (75 61)
---85379--    dSYM= /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so.dSYM/Contents/Resources/DWARF/vgpreload_memcheck-amd64-darwin.so
---85379-- /usr/lib/libc++.1.dylib (rx at 0x1000fc000, rw at 0x100150000)
---85379--    reading syms   from primary file (2023 1671)
---85379-- /usr/lib/libSystem.B.dylib (rx at 0x1001af000, rw at 0x1001b1000)
---85379--    reading syms   from primary file (29 7)
---85379-- /usr/lib/libc++abi.dylib (rx at 0x1001b6000, rw at 0x1001cc000)
---85379--    reading syms   from primary file (375 604)
---85379-- /usr/lib/system/libcache.dylib (rx at 0x1001e2000, rw at 0x1001e7000)
---85379--    reading syms   from primary file (32 28)
---85379-- /usr/lib/system/libcommonCrypto.dylib (rx at 0x1001ec000, rw at 0x1001f7000)
---85379--    reading syms   from primary file (222 164)
---85379-- /usr/lib/system/libcompiler_rt.dylib (rx at 0x100204000, rw at 0x10020c000)
---85379--    reading syms   from primary file (510 8)
---85379-- /usr/lib/system/libcopyfile.dylib (rx at 0x100219000, rw at 0x100223000)
---85379--    reading syms   from primary file (11 37)
---85379-- /usr/lib/system/libcorecrypto.dylib (rx at 0x100229000, rw at 0x1002ae000)
---85379--    reading syms   from primary file (525 697)
---85379-- /usr/lib/system/libdispatch.dylib (rx at 0x1002ca000, rw at 0x100304000)
---85379--    reading syms   from primary file (300 878)
---85379-- /usr/lib/system/libdyld.dylib (rx at 0x100334000, rw at 0x100361000)
---85379--    reading syms   from primary file (107 1127)
---85379-- /usr/lib/system/libkeymgr.dylib (rx at 0x10037f000, rw at 0x100380000)
---85379--    reading syms   from primary file (11 2)
---85379-- /usr/lib/system/libmacho.dylib (rx at 0x10038b000, rw at 0x100391000)
---85379--    reading syms   from primary file (105 2)
---85379-- /usr/lib/system/libquarantine.dylib (rx at 0x100397000, rw at 0x10039a000)
---85379--    reading syms   from primary file (71 12)
---85379-- /usr/lib/system/libremovefile.dylib (rx at 0x1003a0000, rw at 0x1003a2000)
---85379--    reading syms   from primary file (12 6)
---85379-- /usr/lib/system/libsystem_asl.dylib (rx at 0x1003a7000, rw at 0x1003bf000)
---85379--    reading syms   from primary file (220 227)
---85379-- /usr/lib/system/libsystem_blocks.dylib (rx at 0x1003cc000, rw at 0x1003cd000)
---85379--    reading syms   from primary file (21 7)
---85379-- /usr/lib/system/libsystem_c.dylib (rx at 0x1003d1000, rw at 0x100459000)
---85379--    reading syms   from primary file (1342 803)
---85379-- /usr/lib/system/libsystem_configuration.dylib (rx at 0x100481000, rw at 0x100485000)
---85379--    reading syms   from primary file (38 64)
---85379-- /usr/lib/system/libsystem_coreservices.dylib (rx at 0x10048b000, rw at 0x10048f000)
---85379--    reading syms   from primary file (14 43)
---85379-- /usr/lib/system/libsystem_darwin.dylib (rx at 0x100494000, rw at 0x10049b000)
---85379--    reading syms   from primary file (40 331)
---85379-- /usr/lib/system/libsystem_dnssd.dylib (rx at 0x1004a5000, rw at 0x1004ac000)
---85379--    reading syms   from primary file (39 34)
---85379-- /usr/lib/system/libsystem_info.dylib (rx at 0x1004b1000, rw at 0x1004fd000)
---85379--    reading syms   from primary file (426 719)
---85379-- /usr/lib/system/libsystem_m.dylib (rx at 0x100513000, rw at 0x10055f000)
---85379--    reading syms   from primary file (811 1)
---85379-- /usr/lib/system/libsystem_malloc.dylib (rx at 0x10056d000, rw at 0x100598000)
---85379--    reading syms   from primary file (156 420)
---85379-- /usr/lib/system/libsystem_networkextension.dylib (rx at 0x1005a7000, rw at 0x1005b2000)
---85379--    reading syms   from primary file (99 180)
---85379-- /usr/lib/system/libsystem_notify.dylib (rx at 0x1005bd000, rw at 0x1005c5000)
---85379--    reading syms   from primary file (23 1)
---85379-- /usr/lib/system/libsystem_sandbox.dylib (rx at 0x1005cb000, rw at 0x1005cf000)
---85379--    reading syms   from primary file (100 13)
---85379-- /usr/lib/system/libsystem_secinit.dylib (rx at 0x1005d5000, rw at 0x1005d8000)
---85379--    reading syms   from primary file (4 7)
---85379-- /usr/lib/system/libsystem_kernel.dylib (rx at 0x1005dd000, rw at 0x100606000)
---85379--    reading syms   from primary file (1307 120)
---85379-- /usr/lib/system/libsystem_platform.dylib (rx at 0x100620000, rw at 0x10062a000)
---85379--    reading syms   from primary file (166 105)
---85379-- /usr/lib/system/libsystem_pthread.dylib (rx at 0x100632000, rw at 0x10063d000)
---85379--    reading syms   from primary file (186 99)
---85379-- /usr/lib/system/libsystem_symptoms.dylib (rx at 0x100647000, rw at 0x10064f000)
---85379--    reading syms   from primary file (10 89)
---85379-- /usr/lib/system/libsystem_trace.dylib (rx at 0x100655000, rw at 0x10066b000)
---85379--    reading syms   from primary file (128 237)
---85379-- /usr/lib/system/libunwind.dylib (rx at 0x10067a000, rw at 0x100680000)
---85379--    reading syms   from primary file (102 52)
---85379-- /usr/lib/system/libxpc.dylib (rx at 0x100687000, rw at 0x1006b7000)
---85379--    reading syms   from primary file (590 928)
---85379-- /usr/lib/libobjc.A.dylib (rx at 0x1006da000, rw at 0x100e60000)
---85379--    reading syms   from primary file (360 900)
---85379-- REDIR: 0x100621740 (libsystem_platform.dylib:_platform_memcmp) redirected to 0x1000f3c53 (_platform_memcmp)
---85379-- REDIR: 0x100621fc0 (libsystem_platform.dylib:_platform_strncmp) redirected to 0x1000f35ed (_platform_strncmp)
---85379-- REDIR: 0x100622360 (libsystem_platform.dylib:_platform_strcmp) redirected to 0x1000f3667 (_platform_strcmp)
---85379-- REDIR: 0x1005713a6 (libsystem_malloc.dylib:calloc) redirected to 0x1000f1f36 (calloc)
---85379-- REDIR: 0x10057152c (libsystem_malloc.dylib:malloc_default_zone) redirected to 0x1000f2c61 (malloc_default_zone)
---85379-- REDIR: 0x10056ec32 (libsystem_malloc.dylib:malloc_zone_malloc) redirected to 0x1000f1b88 (malloc_zone_malloc)
---85379-- REDIR: 0x1005713e1 (libsystem_malloc.dylib:malloc_zone_calloc) redirected to 0x1000f2122 (malloc_zone_calloc)
---85379-- REDIR: 0x10056ebfd (libsystem_malloc.dylib:malloc) redirected to 0x1000f1920 (malloc)
---85379-- REDIR: 0x100571536 (libsystem_malloc.dylib:malloc_zone_from_ptr) redirected to 0x1000f2ca2 (malloc_zone_from_ptr)
---85379-- REDIR: 0x100571839 (libsystem_malloc.dylib:free) redirected to 0x1000f1cfc (free)
---85379-- REDIR: 0x10057487d (libsystem_malloc.dylib:realloc) redirected to 0x1000f22b4 (realloc)
---85379-- REDIR: 0x1006221a0 (libsystem_platform.dylib:_platform_strchr$VARIANT$Haswell) redirected to 0x1000f2f13 (_platform_strchr$VARIANT$Haswell)
---85379-- REDIR: 0x1006226c0 (libsystem_platform.dylib:_platform_memchr$VARIANT$Haswell) redirected to 0x1000f36e8 (_platform_memchr$VARIANT$Haswell)
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x1000F193C: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1001B7377: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
-==85379==    by 0x100000FD4: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:204)
-==85379==    by 0x1000010F9: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:168)
-==85379==    by 0x10000489E: simple_testing_main() (simulation.cc:203)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x100000FEA: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:205)
-==85379==    by 0x1000010F9: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:168)
-==85379==    by 0x10000489E: simple_testing_main() (simulation.cc:203)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
-==85379== Use of uninitialised value of size 8
-==85379==    at 0x1000021F4: FCLayer::cleanup() (NeuralNetwork.cpp:422)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x100002200: FCLayer::cleanup() (NeuralNetwork.cpp:422)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x10001F036: _dyld_start (in /usr/lib/dyld)
-==85379== 
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x1001B73B7: operator delete(void*) (in /usr/lib/libc++abi.dylib)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x10001F036: _dyld_start (in /usr/lib/dyld)
-==85379== 
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x1000F1D2E: free (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100002211: FCLayer::cleanup() (NeuralNetwork.cpp:422)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x10001F036: _dyld_start (in /usr/lib/dyld)
-==85379== 
-==85379== Invalid free() / delete / delete[] / realloc()
-==85379==    at 0x1000F1D6D: free (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100002211: FCLayer::cleanup() (NeuralNetwork.cpp:422)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Address 0x1048e8940 is on thread 1's stack
-==85379== 
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x100002235: FCLayer::cleanup() (NeuralNetwork.cpp:424)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x1000F1D2E: free (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100002246: FCLayer::cleanup() (NeuralNetwork.cpp:424)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
-==85379== Invalid free() / delete / delete[] / realloc()
-==85379==    at 0x1000F1D6D: free (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100002246: FCLayer::cleanup() (NeuralNetwork.cpp:424)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Address 0x1048e8920 is on thread 1's stack
-==85379==  in frame #3, created by main (simulation.cc:340)
-==85379== 
-==85379== 
-==85379== HEAP SUMMARY:
-==85379==     in use at exit: 81,556 bytes in 2,834 blocks
-==85379==   total heap usage: 4,346 allocs, 1,539 frees, 145,892 bytes allocated
-==85379== 
-==85379== Searching for pointers to 2,834 not-freed blocks
-==85379== Checked 10,731,784 bytes
-==85379== 
-==85379== 14 bytes in 1 blocks are still reachable in loss record 1 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100432518: __setenv_locked (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x10043291A: setenv (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100689099: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
-==85379==    by 0x10002071E: dyld::initializeMainExecutable() (in /usr/lib/dyld)
-==85379== 
-==85379== 16 bytes in 1 blocks are still reachable in loss record 2 of 52
-==85379==    at 0x1000F21B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DDB5A: NXHashInsert (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DCAB4: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 16 bytes in 1 blocks are still reachable in loss record 3 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x10043220F: _owned_ptr_alloc (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1004328EC: setenv (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100689099: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
-==85379==    by 0x10002071E: dyld::initializeMainExecutable() (in /usr/lib/dyld)
-==85379== 
-==85379== 24 bytes in 1 blocks are still reachable in loss record 4 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD874: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F9646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DC0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DB93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 24 bytes in 1 blocks are still reachable in loss record 5 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD874: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DCA91: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 24 bytes in 1 blocks are still reachable in loss record 6 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD874: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DE1A8: _mapStrHash(_NXMapTable*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DCF3C: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 24 bytes in 1 blocks are still reachable in loss record 7 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD874: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DF417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F3067: _unload_image (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379== 
-==85379== 24 bytes in 1 blocks are possibly lost in loss record 8 of 52
-==85379==    at 0x1000F21B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DDDE3: freeBuckets(NXHashTable*, int) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DDAFE: NXHashInsert (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DCAB4: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 24 bytes in 1 blocks are possibly lost in loss record 9 of 52
-==85379==    at 0x1000F21B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DDDE3: freeBuckets(NXHashTable*, int) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DDEC7: remapClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DDE1E: TimeLogger::log(char const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD921: NXHashGet (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DF417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F3067: _unload_image (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379== 
-==85379== 32 bytes in 1 blocks are still reachable in loss record 10 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD9EF: isEqualPrototype(void const*, void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD89C: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F9646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DC0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DB93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379== 
-==85379== 32 bytes in 1 blocks are still reachable in loss record 11 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DDA10: NXHashInsert (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD89C: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F9646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DC0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DB93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379== 
-==85379== 32 bytes in 1 blocks are still reachable in loss record 12 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DDAD4: NXHashInsert (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD89C: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F9646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DC0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DB93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379== 
-==85379== 32 bytes in 1 blocks are still reachable in loss record 13 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD902: NXHashGet (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F9646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DC0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DB93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 32 bytes in 1 blocks are still reachable in loss record 14 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD9EF: isEqualPrototype(void const*, void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DCAB4: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 32 bytes in 1 blocks are still reachable in loss record 15 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DDAD4: NXHashInsert (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DCAB4: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 32 bytes in 1 blocks are still reachable in loss record 16 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD902: NXHashGet (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DF417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F3067: _unload_image (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379== 
-==85379== 32 bytes in 1 blocks are still reachable in loss record 17 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1003F01EF: __Balloc_D2A (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1003ED1B9: __rv_alloc_D2A (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1003ED6BE: __dtoa (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100415BC6: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x10043C1C2: __v2printf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100421B02: _vsnprintf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100421B5F: vsnprintf_l (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100412B16: snprintf_l (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1001067D1: std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, double) const (in /usr/lib/libc++.1.dylib)
-==85379==    by 0x100107B16: std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(double) (in /usr/lib/libc++.1.dylib)
-==85379==    by 0x1000029F6: FL_round_simulation(double**, int**, int**, int, double, FCLayer*, double, bool, bool, bool) (NeuralNetwork.cpp:525)
-==85379== 
-==85379== 36 bytes in 1 blocks are still reachable in loss record 18 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1003F01EF: __Balloc_D2A (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1003F0A73: __d2b_D2A (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1003ED48B: __dtoa (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100415BC6: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x10043C1C2: __v2printf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100421B02: _vsnprintf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100421B5F: vsnprintf_l (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100412B16: snprintf_l (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1001067D1: std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, double) const (in /usr/lib/libc++.1.dylib)
-==85379==    by 0x100107B16: std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(double) (in /usr/lib/libc++.1.dylib)
-==85379==    by 0x1000029F6: FL_round_simulation(double**, int**, int**, int, double, FCLayer*, double, bool, bool, bool) (NeuralNetwork.cpp:525)
-==85379== 
-==85379== 40 bytes in 1 blocks are still reachable in loss record 19 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006E04EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x100689201: xpc_array_create (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100688CB3: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
-==85379== 
-==85379== 48 bytes in 1 blocks are still reachable in loss record 20 of 52
-==85379==    at 0x1000F21B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DDE94: remapClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DDE1E: TimeLogger::log(char const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DDAFE: NXHashInsert (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD89C: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F9646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DC0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DB93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379== 
-==85379== 48 bytes in 1 blocks are still reachable in loss record 21 of 52
-==85379==    at 0x1000F21B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DDE94: remapClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DDE1E: TimeLogger::log(char const*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD921: NXHashGet (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DF417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F3067: _unload_image (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379== 
-==85379== 48 bytes in 2 blocks are still reachable in loss record 22 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DB742: map_images_nolock (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1001B09C4: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379== 
-==85379== 48 bytes in 2 blocks are possibly lost in loss record 23 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DB742: map_images_nolock (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1001B09C4: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379== 
-==85379== 56 bytes in 1 blocks are still reachable in loss record 24 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006E04EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x10069C624: _xpc_pipe_create (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689460: _xpc_create_bootstrap_pipe (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100688FF8: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379== 
-==85379== 64 bytes in 1 blocks are still reachable in loss record 25 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006F298C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 64 bytes in 1 blocks are still reachable in loss record 26 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006F298C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379== 
-==85379== 64 bytes in 1 blocks are still reachable in loss record 27 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006F298C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379== 
-==85379== 64 bytes in 1 blocks are still reachable in loss record 28 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006F298C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379== 
-==85379== 64 bytes in 1 blocks are still reachable in loss record 29 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100689294: _xpc_calloc (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689218: xpc_array_create (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100688CB3: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
-==85379==    by 0x10002071E: dyld::initializeMainExecutable() (in /usr/lib/dyld)
-==85379== 
-==85379== 64 bytes in 1 blocks are still reachable in loss record 30 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100432221: _owned_ptr_alloc (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1004328EC: setenv (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100689099: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
-==85379==    by 0x10002071E: dyld::initializeMainExecutable() (in /usr/lib/dyld)
-==85379== 
-==85379== 80 bytes in 1 blocks are still reachable in loss record 31 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1003F016F: __Balloc_D2A (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1003F0A73: __d2b_D2A (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1003ED48B: __dtoa (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100415BC6: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x10043C1C2: __v2printf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100421B02: _vsnprintf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100421B5F: vsnprintf_l (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100412B16: snprintf_l (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1001067D1: std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, double) const (in /usr/lib/libc++.1.dylib)
-==85379==    by 0x100107B16: std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(double) (in /usr/lib/libc++.1.dylib)
-==85379==    by 0x1000029F6: FL_round_simulation(double**, int**, int**, int, double, FCLayer*, double, bool, bool, bool) (NeuralNetwork.cpp:525)
-==85379== 
-==85379== 120 bytes in 1 blocks are still reachable in loss record 32 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006E04EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D22F6: _dispatch_lane_create_with_target (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x100656C73: _libtrace_init (in /usr/lib/system/libsystem_trace.dylib)
-==85379==    by 0x1001B09CE: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
-==85379== 
-==85379== 192 bytes in 1 blocks are still reachable in loss record 33 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006E04EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x100689692: xpc_dictionary_create (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x10068954D: _xpc_collect_environment (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100688FFD: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379== 
-==85379== 192 bytes in 1 blocks are still reachable in loss record 34 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006E04EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x100689692: xpc_dictionary_create (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689C80: _xpc_dyld_image_callback (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100022873: dyld::registerLoadCallback(void (*)(mach_header const*, char const*, bool)) (in /usr/lib/dyld)
-==85379==    by 0x100689BA1: _xpc_collect_images (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689002: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379== 
-==85379== 240 bytes in 6 blocks are still reachable in loss record 35 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006E04EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1006A348B: _xpc_string_create (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x10068974D: xpc_string_create (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689704: xpc_dictionary_set_string (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689579: _xpc_collect_environment (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100688FFD: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379== 
-==85379== 252 bytes in 2 blocks are still reachable in loss record 36 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100689AB8: _xpc_malloc (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689973: _xpc_dictionary_insert (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689CE9: _xpc_dyld_image_callback (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100022873: dyld::registerLoadCallback(void (*)(mach_header const*, char const*, bool)) (in /usr/lib/dyld)
-==85379==    by 0x100689BA1: _xpc_collect_images (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689002: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379== 
-==85379== 256 bytes in 4 blocks are still reachable in loss record 37 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006F298C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 256 bytes in 4 blocks are still reachable in loss record 38 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006F298C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 303 bytes in 6 blocks are still reachable in loss record 39 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100689AB8: _xpc_malloc (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689973: _xpc_dictionary_insert (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689715: xpc_dictionary_set_string (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689579: _xpc_collect_environment (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100688FFD: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379== 
-==85379== 336 bytes in 21 blocks are indirectly lost in loss record 40 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1001B7377: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
-==85379==    by 0x10000101A: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:206)
-==85379==    by 0x1000010F9: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:168)
-==85379==    by 0x10000489E: simple_testing_main() (simulation.cc:203)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379== 
-==85379== 407 bytes in 6 blocks are still reachable in loss record 41 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100429C03: strdup (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100689732: xpc_string_create (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689704: xpc_dictionary_set_string (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100689579: _xpc_collect_environment (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x100688FFD: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
-==85379==    by 0x1001B09C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379==    by 0x100036591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100036797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==85379==    by 0x100031BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100031B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379==    by 0x100030D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==85379== 
-==85379== 504 (168 direct, 336 indirect) bytes in 3 blocks are definitely lost in loss record 42 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1001B7377: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
-==85379==    by 0x100000FD4: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:204)
-==85379==    by 0x1000010F9: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:168)
-==85379==    by 0x10000489E: simple_testing_main() (simulation.cc:203)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379== 
-==85379== 528 bytes in 1 blocks are possibly lost in loss record 43 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD968: NXHashGet (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DF417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F3067: _unload_image (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379== 
-==85379== 736 bytes in 1 blocks are still reachable in loss record 44 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1003F4CC0: arc4_init (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1003F4E1C: arc4random_buf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x1006DCA24: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 2,064 bytes in 1 blocks are possibly lost in loss record 45 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DD968: NXHashGet (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DCA91: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 2,064 bytes in 1 blocks are possibly lost in loss record 46 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DE845: objc_class::setHasCustomRR(bool) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DE70F: addSubclass(objc_class*, objc_class*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD021: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 3,200 bytes in 50 blocks are still reachable in loss record 47 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006F298C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1001B09C4: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==85379== 
-==85379== 3,200 bytes in 50 blocks are still reachable in loss record 48 of 52
-==85379==    at 0x1000F1FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006F298C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DBA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006EE55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x10002347A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
-==85379==    by 0x10002362D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
-==85379==    by 0x100335A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
-==85379==    by 0x1006DB233: environ_init (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1002CCE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==85379==    by 0x1002D8AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==85379== 
-==85379== 4,096 bytes in 1 blocks are still reachable in loss record 49 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x10040EDE8: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x10042289C: __swsetup (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x10040E003: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x10040E5B5: fwrite (in /usr/lib/system/libsystem_c.dylib)
-==85379==    by 0x100009990: std::__1::basic_streambuf<char, std::__1::char_traits<char> >::sputn(char const*, long) (streambuf:230)
-==85379==    by 0x10000979F: std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char) (locale:1416)
-==85379==    by 0x1000093F2: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long) (ostream:726)
-==85379==    by 0x10000109B: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::operator<< <std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*) (ostream:865)
-==85379==    by 0x100000D0E: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:172)
-==85379==    by 0x1000010F9: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:168)
-==85379==    by 0x10000489E: simple_testing_main() (simulation.cc:203)
-==85379== 
-==85379== 4,112 bytes in 1 blocks are possibly lost in loss record 50 of 52
-==85379==    at 0x1000F1C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1006DE845: objc_class::setHasCustomRR(bool) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DE70F: addSubclass(objc_class*, objc_class*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F96A8: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006E9E29: updateCustomRR_AWZ(objc_class*, method_t*) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DEEC4: addMethod(objc_class*, objc_selector*, void (*)(), char const*, bool) (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2FDE: realizeAllClasses() (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006F2A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
-==85379==    by 0x1006DD266: _read_images (in /usr/lib/libobjc.A.dylib)
-==85379== 
-==85379== 38,400 bytes in 2,400 blocks are indirectly lost in loss record 51 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1001B7377: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
-==85379==    by 0x100001C5D: FCLayer::backward(double**, int**, double**, double**, double, double) (NeuralNetwork.cpp:366)
-==85379==    by 0x100002A4B: FL_round_simulation(double**, int**, int**, int, double, FCLayer*, double, bool, bool, bool) (NeuralNetwork.cpp:528)
-==85379==    by 0x100005241: simple_testing_main() (simulation.cc:273)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379== 
-==85379== 57,600 (19,200 direct, 38,400 indirect) bytes in 240 blocks are definitely lost in loss record 52 of 52
-==85379==    at 0x1000F1995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1001B7377: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
-==85379==    by 0x100001C0E: FCLayer::backward(double**, int**, double**, double**, double, double) (NeuralNetwork.cpp:362)
-==85379==    by 0x100002A4B: FL_round_simulation(double**, int**, int**, int, double, FCLayer*, double, bool, bool, bool) (NeuralNetwork.cpp:528)
-==85379==    by 0x100005241: simple_testing_main() (simulation.cc:273)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379== 
-==85379== LEAK SUMMARY:
-==85379==    definitely lost: 19,368 bytes in 243 blocks
-==85379==    indirectly lost: 38,736 bytes in 2,421 blocks
-==85379==      possibly lost: 8,864 bytes in 8 blocks
-==85379==    still reachable: 14,588 bytes in 162 blocks
-==85379==         suppressed: 0 bytes in 0 blocks
-==85379== 
-==85379== ERROR SUMMARY: 96 errors from 19 contexts (suppressed: 396 from 7)
-==85379== 
-==85379== 1 errors in context 1 of 19:
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x1000F193C: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x1001B7377: operator new(unsigned long) (in /usr/lib/libc++abi.dylib)
-==85379==    by 0x100000FD4: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:204)
-==85379==    by 0x1000010F9: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:168)
-==85379==    by 0x10000489E: simple_testing_main() (simulation.cc:203)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
-==85379== 
-==85379== 2 errors in context 2 of 19:
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x100000FEA: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:205)
-==85379==    by 0x1000010F9: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:168)
-==85379==    by 0x10000489E: simple_testing_main() (simulation.cc:203)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
-==85379== 
-==85379== 3 errors in context 3 of 19:
-==85379== Invalid free() / delete / delete[] / realloc()
-==85379==    at 0x1000F1D6D: free (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100002246: FCLayer::cleanup() (NeuralNetwork.cpp:424)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Address 0x1048e8920 is on thread 1's stack
-==85379==  in frame #3, created by main (simulation.cc:340)
-==85379== 
-==85379== 
-==85379== 3 errors in context 4 of 19:
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x1000F1D2E: free (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100002246: FCLayer::cleanup() (NeuralNetwork.cpp:424)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
-==85379== 
-==85379== 3 errors in context 5 of 19:
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x100002235: FCLayer::cleanup() (NeuralNetwork.cpp:424)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
-==85379== 
-==85379== 6 errors in context 6 of 19:
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x1000F1D2E: free (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100002211: FCLayer::cleanup() (NeuralNetwork.cpp:422)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x10001F036: _dyld_start (in /usr/lib/dyld)
-==85379== 
-==85379== 
-==85379== 6 errors in context 7 of 19:
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x100002200: FCLayer::cleanup() (NeuralNetwork.cpp:422)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x10001F036: _dyld_start (in /usr/lib/dyld)
-==85379== 
-==85379== 
-==85379== 9 errors in context 8 of 19:
-==85379== Conditional jump or move depends on uninitialised value(s)
-==85379==    at 0x1001B73B7: operator delete(void*) (in /usr/lib/libc++abi.dylib)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x10001F036: _dyld_start (in /usr/lib/dyld)
-==85379== 
-==85379== 
-==85379== 24 errors in context 9 of 19:
-==85379== Invalid free() / delete / delete[] / realloc()
-==85379==    at 0x1000F1D6D: free (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==85379==    by 0x100002211: FCLayer::cleanup() (NeuralNetwork.cpp:422)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Address 0x1048e8940 is on thread 1's stack
-==85379== 
-==85379== 
-==85379== 30 errors in context 10 of 19:
-==85379== Use of uninitialised value of size 8
-==85379==    at 0x1000021F4: FCLayer::cleanup() (NeuralNetwork.cpp:422)
-==85379==    by 0x10000575E: simple_testing_main() (simulation.cc:323)
-==85379==    by 0x100005A8C: main (simulation.cc:342)
-==85379==  Uninitialised value was created by a stack allocation
-==85379==    at 0x100004770: simple_testing_main() (simulation.cc:189)
-==85379== 
---85379-- 
---85379-- used_suppression:      1 OSX1014:dyld-3 /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/default.supp:742
---85379-- used_suppression:    395 OSX1014:dyld-1 /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/default.supp:726
-==85379== 
-==85379== ERROR SUMMARY: 96 errors from 19 contexts (suppressed: 396 from 7)
+==95865== Memcheck, a memory error detector
+==95865== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==95865== Using Valgrind-3.17.0.GIT-lbmacos-adaae87a41-20201121 and LibVEX; rerun with -h for copyright info
+==95865== Command: ./simulation
+==95865== Parent PID: 44703
+==95865== 
+--95865-- 
+--95865-- Valgrind options:
+--95865--    --leak-check=full
+--95865--    --show-leak-kinds=all
+--95865--    --track-origins=yes
+--95865--    --verbose
+--95865--    --log-file=valgrind-out.txt
+--95865-- Output from sysctl({CTL_KERN,KERN_VERSION}):
+--95865--   Darwin Kernel Version 18.7.0: Thu Jun 18 20:50:10 PDT 2020; root:xnu-4903.278.43~1/RELEASE_X86_64
+--95865-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand
+--95865-- Page sizes: currently 4096, max supported 4096
+--95865-- Valgrind library directory: /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind
+--95865-- ./simulation (rx at 0x100000000, rw at 0x10000d000)
+--95865--    reading syms   from primary file (52 1204)
+--95865--    dSYM= ./simulation.dSYM/Contents/Resources/DWARF/simulation
+--95865--    reading dwarf3 from dsyms file
+--95865-- /usr/lib/dyld (rx at 0x10001f000, rw at 0x10008a000)
+--95865--    reading syms   from primary file (5 2133)
+--95865-- Scheduler: using generic scheduler lock implementation.
+--95865-- Reading suppressions file: /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/default.supp
+==95865== embedded gdbserver: reading from /var/folders/fh/2kh5624x67xg8bzs6xjpqlsc0000gn/T//vgdb-pipe-from-vgdb-to-95865-by-kavyakopparapu-on-???
+==95865== embedded gdbserver: writing to   /var/folders/fh/2kh5624x67xg8bzs6xjpqlsc0000gn/T//vgdb-pipe-to-vgdb-from-95865-by-kavyakopparapu-on-???
+==95865== embedded gdbserver: shared mem   /var/folders/fh/2kh5624x67xg8bzs6xjpqlsc0000gn/T//vgdb-pipe-shared-mem-vgdb-95865-by-kavyakopparapu-on-???
+==95865== 
+==95865== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==95865== don't want to do, unless you know exactly what you're doing,
+==95865== or are doing some strange experiment):
+==95865==   /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/../../bin/vgdb --pid=95865 ...command...
+==95865== 
+==95865== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==95865==   /path/to/gdb ./simulation
+==95865== and then give GDB the following command
+==95865==   target remote | /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/../../bin/vgdb --pid=95865
+==95865== --pid is optional if only one valgrind process is running
+==95865== 
+--95865-- REDIR: 0x100060120 (dyld:strcmp) redirected to 0x258057910 (???)
+--95865-- REDIR: 0x10005a5f6 (dyld:arc4random) redirected to 0x2580579ae (???)
+--95865-- REDIR: 0x10005f500 (dyld:strlen) redirected to 0x2580578df (???)
+--95865-- REDIR: 0x100060420 (dyld:strcpy) redirected to 0x25805792c (???)
+--95865-- REDIR: 0x10005d6f0 (dyld:strcat) redirected to 0x2580578f0 (???)
+--95865-- REDIR: 0x10005f2f0 (dyld:strlcat) redirected to 0x258057949 (???)
+--95865-- /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_core-amd64-darwin.so (rx at 0x1000ea000, rw at 0x1000ee000)
+--95865--    reading syms   from primary file (3 52)
+--95865--    dSYM= /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_core-amd64-darwin.so.dSYM/Contents/Resources/DWARF/vgpreload_core-amd64-darwin.so
+--95865-- /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so (rx at 0x1000f1000, rw at 0x1000f8000)
+--95865--    reading syms   from primary file (75 61)
+--95865--    dSYM= /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so.dSYM/Contents/Resources/DWARF/vgpreload_memcheck-amd64-darwin.so
+--95865-- /usr/lib/libc++.1.dylib (rx at 0x1000fd000, rw at 0x100151000)
+--95865--    reading syms   from primary file (2023 1671)
+--95865-- /usr/lib/libSystem.B.dylib (rx at 0x1001b0000, rw at 0x1001b2000)
+--95865--    reading syms   from primary file (29 7)
+--95865-- /usr/lib/libc++abi.dylib (rx at 0x1001b7000, rw at 0x1001cd000)
+--95865--    reading syms   from primary file (375 604)
+--95865-- /usr/lib/system/libcache.dylib (rx at 0x1001e3000, rw at 0x1001e8000)
+--95865--    reading syms   from primary file (32 28)
+--95865-- /usr/lib/system/libcommonCrypto.dylib (rx at 0x1001ed000, rw at 0x1001f8000)
+--95865--    reading syms   from primary file (222 164)
+--95865-- /usr/lib/system/libcompiler_rt.dylib (rx at 0x100205000, rw at 0x10020d000)
+--95865--    reading syms   from primary file (510 8)
+--95865-- /usr/lib/system/libcopyfile.dylib (rx at 0x10021a000, rw at 0x100224000)
+--95865--    reading syms   from primary file (11 37)
+--95865-- /usr/lib/system/libcorecrypto.dylib (rx at 0x10022a000, rw at 0x1002af000)
+--95865--    reading syms   from primary file (525 697)
+--95865-- /usr/lib/system/libdispatch.dylib (rx at 0x1002cb000, rw at 0x100305000)
+--95865--    reading syms   from primary file (300 878)
+--95865-- /usr/lib/system/libdyld.dylib (rx at 0x100335000, rw at 0x100362000)
+--95865--    reading syms   from primary file (107 1127)
+--95865-- /usr/lib/system/libkeymgr.dylib (rx at 0x100380000, rw at 0x100381000)
+--95865--    reading syms   from primary file (11 2)
+--95865-- /usr/lib/system/libmacho.dylib (rx at 0x10038c000, rw at 0x100392000)
+--95865--    reading syms   from primary file (105 2)
+--95865-- /usr/lib/system/libquarantine.dylib (rx at 0x100398000, rw at 0x10039b000)
+--95865--    reading syms   from primary file (71 12)
+--95865-- /usr/lib/system/libremovefile.dylib (rx at 0x1003a1000, rw at 0x1003a3000)
+--95865--    reading syms   from primary file (12 6)
+--95865-- /usr/lib/system/libsystem_asl.dylib (rx at 0x1003a8000, rw at 0x1003c0000)
+--95865--    reading syms   from primary file (220 227)
+--95865-- /usr/lib/system/libsystem_blocks.dylib (rx at 0x1003cd000, rw at 0x1003ce000)
+--95865--    reading syms   from primary file (21 7)
+--95865-- /usr/lib/system/libsystem_c.dylib (rx at 0x1003d2000, rw at 0x10045a000)
+--95865--    reading syms   from primary file (1342 803)
+--95865-- /usr/lib/system/libsystem_configuration.dylib (rx at 0x100482000, rw at 0x100486000)
+--95865--    reading syms   from primary file (38 64)
+--95865-- /usr/lib/system/libsystem_coreservices.dylib (rx at 0x10048c000, rw at 0x100490000)
+--95865--    reading syms   from primary file (14 43)
+--95865-- /usr/lib/system/libsystem_darwin.dylib (rx at 0x100495000, rw at 0x10049c000)
+--95865--    reading syms   from primary file (40 331)
+--95865-- /usr/lib/system/libsystem_dnssd.dylib (rx at 0x1004a6000, rw at 0x1004ad000)
+--95865--    reading syms   from primary file (39 34)
+--95865-- /usr/lib/system/libsystem_info.dylib (rx at 0x1004b2000, rw at 0x1004fe000)
+--95865--    reading syms   from primary file (426 719)
+--95865-- /usr/lib/system/libsystem_m.dylib (rx at 0x100514000, rw at 0x100560000)
+--95865--    reading syms   from primary file (811 1)
+--95865-- /usr/lib/system/libsystem_malloc.dylib (rx at 0x10056e000, rw at 0x100599000)
+--95865--    reading syms   from primary file (156 420)
+--95865-- /usr/lib/system/libsystem_networkextension.dylib (rx at 0x1005a8000, rw at 0x1005b3000)
+--95865--    reading syms   from primary file (99 180)
+--95865-- /usr/lib/system/libsystem_notify.dylib (rx at 0x1005be000, rw at 0x1005c6000)
+--95865--    reading syms   from primary file (23 1)
+--95865-- /usr/lib/system/libsystem_sandbox.dylib (rx at 0x1005cc000, rw at 0x1005d0000)
+--95865--    reading syms   from primary file (100 13)
+--95865-- /usr/lib/system/libsystem_secinit.dylib (rx at 0x1005d6000, rw at 0x1005d9000)
+--95865--    reading syms   from primary file (4 7)
+--95865-- /usr/lib/system/libsystem_kernel.dylib (rx at 0x1005de000, rw at 0x100607000)
+--95865--    reading syms   from primary file (1307 120)
+--95865-- /usr/lib/system/libsystem_platform.dylib (rx at 0x100621000, rw at 0x10062b000)
+--95865--    reading syms   from primary file (166 105)
+--95865-- /usr/lib/system/libsystem_pthread.dylib (rx at 0x100633000, rw at 0x10063e000)
+--95865--    reading syms   from primary file (186 99)
+--95865-- /usr/lib/system/libsystem_symptoms.dylib (rx at 0x100648000, rw at 0x100650000)
+--95865--    reading syms   from primary file (10 89)
+--95865-- /usr/lib/system/libsystem_trace.dylib (rx at 0x100656000, rw at 0x10066c000)
+--95865--    reading syms   from primary file (128 237)
+--95865-- /usr/lib/system/libunwind.dylib (rx at 0x10067b000, rw at 0x100681000)
+--95865--    reading syms   from primary file (102 52)
+--95865-- /usr/lib/system/libxpc.dylib (rx at 0x100688000, rw at 0x1006b8000)
+--95865--    reading syms   from primary file (590 928)
+--95865-- /usr/lib/libobjc.A.dylib (rx at 0x1006db000, rw at 0x100e61000)
+--95865--    reading syms   from primary file (360 900)
+--95865-- REDIR: 0x100622740 (libsystem_platform.dylib:_platform_memcmp) redirected to 0x1000f4c53 (_platform_memcmp)
+--95865-- REDIR: 0x100622fc0 (libsystem_platform.dylib:_platform_strncmp) redirected to 0x1000f45ed (_platform_strncmp)
+--95865-- REDIR: 0x100623360 (libsystem_platform.dylib:_platform_strcmp) redirected to 0x1000f4667 (_platform_strcmp)
+--95865-- REDIR: 0x1005723a6 (libsystem_malloc.dylib:calloc) redirected to 0x1000f2f36 (calloc)
+--95865-- REDIR: 0x10057252c (libsystem_malloc.dylib:malloc_default_zone) redirected to 0x1000f3c61 (malloc_default_zone)
+--95865-- REDIR: 0x10056fc32 (libsystem_malloc.dylib:malloc_zone_malloc) redirected to 0x1000f2b88 (malloc_zone_malloc)
+--95865-- REDIR: 0x1005723e1 (libsystem_malloc.dylib:malloc_zone_calloc) redirected to 0x1000f3122 (malloc_zone_calloc)
+--95865-- REDIR: 0x10056fbfd (libsystem_malloc.dylib:malloc) redirected to 0x1000f2920 (malloc)
+--95865-- REDIR: 0x100572536 (libsystem_malloc.dylib:malloc_zone_from_ptr) redirected to 0x1000f3ca2 (malloc_zone_from_ptr)
+--95865-- REDIR: 0x100572839 (libsystem_malloc.dylib:free) redirected to 0x1000f2cfc (free)
+--95865-- REDIR: 0x10057587d (libsystem_malloc.dylib:realloc) redirected to 0x1000f32b4 (realloc)
+--95865-- REDIR: 0x1006231a0 (libsystem_platform.dylib:_platform_strchr$VARIANT$Haswell) redirected to 0x1000f3f13 (_platform_strchr$VARIANT$Haswell)
+--95865-- REDIR: 0x1006236c0 (libsystem_platform.dylib:_platform_memchr$VARIANT$Haswell) redirected to 0x1000f46e8 (_platform_memchr$VARIANT$Haswell)
+==95865== 
+==95865== HEAP SUMMARY:
+==95865==     in use at exit: 23,452 bytes in 170 blocks
+==95865==   total heap usage: 2,963 allocs, 2,793 frees, 1,639,796 bytes allocated
+==95865== 
+==95865== Searching for pointers to 170 not-freed blocks
+==95865== Checked 10,731,784 bytes
+==95865== 
+==95865== 14 bytes in 1 blocks are still reachable in loss record 1 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x100433518: __setenv_locked (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10043391A: setenv (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10068A099: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
+==95865==    by 0x10002171E: dyld::initializeMainExecutable() (in /usr/lib/dyld)
+==95865== 
+==95865== 16 bytes in 1 blocks are still reachable in loss record 2 of 48
+==95865==    at 0x1000F31B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DEB5A: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DDAB4: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 16 bytes in 1 blocks are still reachable in loss record 3 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x10043320F: _owned_ptr_alloc (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1004338EC: setenv (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10068A099: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
+==95865==    by 0x10002171E: dyld::initializeMainExecutable() (in /usr/lib/dyld)
+==95865== 
+==95865== 24 bytes in 1 blocks are still reachable in loss record 4 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE874: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006FA646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DD0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DC93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 24 bytes in 1 blocks are still reachable in loss record 5 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE874: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DDA91: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 24 bytes in 1 blocks are still reachable in loss record 6 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE874: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DF1A8: _mapStrHash(_NXMapTable*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DDF3C: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 24 bytes in 1 blocks are still reachable in loss record 7 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE874: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006E0417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F4067: _unload_image (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865== 
+==95865== 24 bytes in 1 blocks are possibly lost in loss record 8 of 48
+==95865==    at 0x1000F31B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DEDE3: freeBuckets(NXHashTable*, int) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DEAFE: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DDAB4: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 24 bytes in 1 blocks are possibly lost in loss record 9 of 48
+==95865==    at 0x1000F31B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DEDE3: freeBuckets(NXHashTable*, int) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DEEC7: remapClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DEE1E: TimeLogger::log(char const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE921: NXHashGet (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006E0417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F4067: _unload_image (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865== 
+==95865== 32 bytes in 1 blocks are still reachable in loss record 10 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE9EF: isEqualPrototype(void const*, void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE89C: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006FA646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DD0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DC93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865== 
+==95865== 32 bytes in 1 blocks are still reachable in loss record 11 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DEA10: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE89C: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006FA646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DD0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DC93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865== 
+==95865== 32 bytes in 1 blocks are still reachable in loss record 12 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DEAD4: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE89C: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006FA646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DD0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DC93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865== 
+==95865== 32 bytes in 1 blocks are still reachable in loss record 13 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE902: NXHashGet (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006FA646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DD0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DC93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 32 bytes in 1 blocks are still reachable in loss record 14 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE9EF: isEqualPrototype(void const*, void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DDAB4: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 32 bytes in 1 blocks are still reachable in loss record 15 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DEAD4: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DDAB4: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 32 bytes in 1 blocks are still reachable in loss record 16 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE902: NXHashGet (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006E0417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F4067: _unload_image (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865== 
+==95865== 32 bytes in 1 blocks are still reachable in loss record 17 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1003F11EF: __Balloc_D2A (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1003EE1B9: __rv_alloc_D2A (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1003EE6BE: __dtoa (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100416BC6: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10043D1C2: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100422B02: _vsnprintf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100422B5F: vsnprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100413B16: snprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1001077D1: std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, double) const (in /usr/lib/libc++.1.dylib)
+==95865==    by 0x100108B16: std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(double) (in /usr/lib/libc++.1.dylib)
+==95865==    by 0x100002996: FL_round_simulation(double**, int**, int**, int, double, FCLayer*, double, bool, bool, bool) (NeuralNetwork.cpp:526)
+==95865== 
+==95865== 36 bytes in 1 blocks are still reachable in loss record 18 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1003F11EF: __Balloc_D2A (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1003F1A73: __d2b_D2A (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1003EE48B: __dtoa (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100416BC6: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10043D1C2: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100422B02: _vsnprintf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100422B5F: vsnprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100413B16: snprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1001077D1: std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, double) const (in /usr/lib/libc++.1.dylib)
+==95865==    by 0x100108B16: std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(double) (in /usr/lib/libc++.1.dylib)
+==95865==    by 0x100002996: FL_round_simulation(double**, int**, int**, int, double, FCLayer*, double, bool, bool, bool) (NeuralNetwork.cpp:526)
+==95865== 
+==95865== 40 bytes in 1 blocks are still reachable in loss record 19 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006E14EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x10068A201: xpc_array_create (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x100689CB3: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
+==95865== 
+==95865== 48 bytes in 1 blocks are still reachable in loss record 20 of 48
+==95865==    at 0x1000F31B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DEE94: remapClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DEE1E: TimeLogger::log(char const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DEAFE: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE9BF: hashPrototype(void const*, void const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE89C: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006FA646: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DD0F8: objc_opt::objc_stringhash_t::getIndex(char const*) const (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DC93B: objc_image_info* getDataSection<objc_image_info>(mach_header_64 const*, char const*, unsigned long*, unsigned long*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865== 
+==95865== 48 bytes in 1 blocks are still reachable in loss record 21 of 48
+==95865==    at 0x1000F31B1: malloc_zone_calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DEE94: remapClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DEE1E: TimeLogger::log(char const*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE921: NXHashGet (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006E0417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F4067: _unload_image (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865== 
+==95865== 48 bytes in 2 blocks are still reachable in loss record 22 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DC742: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1001B19C4: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865== 
+==95865== 48 bytes in 2 blocks are possibly lost in loss record 23 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DC742: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1001B19C4: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865== 
+==95865== 56 bytes in 1 blocks are still reachable in loss record 24 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006E14EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x10069D624: _xpc_pipe_create (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A460: _xpc_create_bootstrap_pipe (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x100689FF8: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865== 
+==95865== 64 bytes in 1 blocks are still reachable in loss record 25 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006F398C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 64 bytes in 1 blocks are still reachable in loss record 26 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006F398C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865== 
+==95865== 64 bytes in 1 blocks are still reachable in loss record 27 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006F398C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865== 
+==95865== 64 bytes in 1 blocks are still reachable in loss record 28 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006F398C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865== 
+==95865== 64 bytes in 1 blocks are still reachable in loss record 29 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x10068A294: _xpc_calloc (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A218: xpc_array_create (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x100689CB3: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
+==95865==    by 0x10002171E: dyld::initializeMainExecutable() (in /usr/lib/dyld)
+==95865== 
+==95865== 64 bytes in 1 blocks are still reachable in loss record 30 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x100433221: _owned_ptr_alloc (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1004338EC: setenv (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10068A099: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
+==95865==    by 0x10002171E: dyld::initializeMainExecutable() (in /usr/lib/dyld)
+==95865== 
+==95865== 80 bytes in 1 blocks are still reachable in loss record 31 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1003F116F: __Balloc_D2A (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1003F1A73: __d2b_D2A (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1003EE48B: __dtoa (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100416BC6: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10043D1C2: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100422B02: _vsnprintf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100422B5F: vsnprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100413B16: snprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1001077D1: std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, double) const (in /usr/lib/libc++.1.dylib)
+==95865==    by 0x100108B16: std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(double) (in /usr/lib/libc++.1.dylib)
+==95865==    by 0x100002996: FL_round_simulation(double**, int**, int**, int, double, FCLayer*, double, bool, bool, bool) (NeuralNetwork.cpp:526)
+==95865== 
+==95865== 120 bytes in 1 blocks are still reachable in loss record 32 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006E14EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D32F6: _dispatch_lane_create_with_target (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x100657C73: _libtrace_init (in /usr/lib/system/libsystem_trace.dylib)
+==95865==    by 0x1001B19CE: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031E04: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
+==95865== 
+==95865== 192 bytes in 1 blocks are still reachable in loss record 33 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006E14EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x10068A692: xpc_dictionary_create (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A54D: _xpc_collect_environment (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x100689FFD: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865== 
+==95865== 192 bytes in 1 blocks are still reachable in loss record 34 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006E14EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x10068A692: xpc_dictionary_create (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068AC80: _xpc_dyld_image_callback (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x100023873: dyld::registerLoadCallback(void (*)(mach_header const*, char const*, bool)) (in /usr/lib/dyld)
+==95865==    by 0x10068ABA1: _xpc_collect_images (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A002: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865== 
+==95865== 240 bytes in 6 blocks are still reachable in loss record 35 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006E14EB: objc_msgLookup (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDEF3: _os_object_alloc_realized (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1006A448B: _xpc_string_create (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A74D: xpc_string_create (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A704: xpc_dictionary_set_string (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A579: _xpc_collect_environment (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x100689FFD: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865== 
+==95865== 252 bytes in 2 blocks are still reachable in loss record 36 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x10068AAB8: _xpc_malloc (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A973: _xpc_dictionary_insert (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068ACE9: _xpc_dyld_image_callback (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x100023873: dyld::registerLoadCallback(void (*)(mach_header const*, char const*, bool)) (in /usr/lib/dyld)
+==95865==    by 0x10068ABA1: _xpc_collect_images (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A002: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865== 
+==95865== 256 bytes in 4 blocks are still reachable in loss record 37 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006F398C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 256 bytes in 4 blocks are still reachable in loss record 38 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006F398C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 303 bytes in 6 blocks are still reachable in loss record 39 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x10068AAB8: _xpc_malloc (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A973: _xpc_dictionary_insert (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A715: xpc_dictionary_set_string (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A579: _xpc_collect_environment (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x100689FFD: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865== 
+==95865== 407 bytes in 6 blocks are still reachable in loss record 40 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x10042AC03: strdup (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10068A732: xpc_string_create (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A704: xpc_dictionary_set_string (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x10068A579: _xpc_collect_environment (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x100689FFD: _libxpc_initializer (in /usr/lib/system/libxpc.dylib)
+==95865==    by 0x1001B19C9: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865==    by 0x100037591: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100037797: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==95865==    by 0x100032BE9: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100032B7F: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, char const*, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865==    by 0x100031D72: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==95865== 
+==95865== 528 bytes in 1 blocks are possibly lost in loss record 41 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE968: NXHashGet (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006E0417: NXMapRemove (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F4067: _unload_image (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865== 
+==95865== 736 bytes in 1 blocks are still reachable in loss record 42 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1003F5CC0: arc4_init (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1003F5E1C: arc4random_buf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x1006DDA24: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 2,064 bytes in 1 blocks are possibly lost in loss record 43 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DE968: NXHashGet (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE846: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DDA91: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 2,064 bytes in 1 blocks are possibly lost in loss record 44 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DF845: objc_class::setHasCustomRR(bool) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DF70F: addSubclass(objc_class*, objc_class*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE021: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 3,200 bytes in 50 blocks are still reachable in loss record 45 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006F398C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1001B19C4: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==95865== 
+==95865== 3,200 bytes in 50 blocks are still reachable in loss record 46 of 48
+==95865==    at 0x1000F2FF0: calloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006F398C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DCA4F: _hasObjcContents (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EF55F: __objc_personality_v0 (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x10002447A: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==95865==    by 0x10002462D: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==95865==    by 0x100336A26: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==95865==    by 0x1006DC233: environ_init (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1002CDE35: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==95865==    by 0x1002D9AD1: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==95865== 
+==95865== 4,096 bytes in 1 blocks are still reachable in loss record 47 of 48
+==95865==    at 0x1000F2995: malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x10040FDE8: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10042389C: __swsetup (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10040F003: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x10040F5B5: fwrite (in /usr/lib/system/libsystem_c.dylib)
+==95865==    by 0x100009990: std::__1::basic_streambuf<char, std::__1::char_traits<char> >::sputn(char const*, long) (streambuf:230)
+==95865==    by 0x10000979F: std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char) (locale:1416)
+==95865==    by 0x1000093F2: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long) (ostream:726)
+==95865==    by 0x1000010DB: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::operator<< <std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*) (ostream:865)
+==95865==    by 0x100000D64: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:178)
+==95865==    by 0x100001139: FCLayer::FCLayer(int, int, double, int, int, bool) (NeuralNetwork.cpp:171)
+==95865==    by 0x100002FF5: main_sim() (simulation.cc:56)
+==95865== 
+==95865== 4,112 bytes in 1 blocks are possibly lost in loss record 48 of 48
+==95865==    at 0x1000F2C0A: malloc_zone_malloc (in /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
+==95865==    by 0x1006DF845: objc_class::setHasCustomRR(bool) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DF70F: addSubclass(objc_class*, objc_class*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006FA6A8: std::__1::__hash_table<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, std::__1::__unordered_map_hasher<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerHash, true>, std::__1::__unordered_map_equal<unsigned long, std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*>, objc_references_support::DisguisedPointerEqual, true>, objc_references_support::ObjcAllocator<std::__1::__hash_value_type<unsigned long, objc_references_support::ObjectAssociationMap*> > >::__rehash(unsigned long) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006EAE29: updateCustomRR_AWZ(objc_class*, method_t*) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DFEC4: addMethod(objc_class*, objc_selector*, void (*)(), char const*, bool) (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3FDE: realizeAllClasses() (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A8C: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006F3A6B: _objc_flush_caches (in /usr/lib/libobjc.A.dylib)
+==95865==    by 0x1006DE266: _read_images (in /usr/lib/libobjc.A.dylib)
+==95865== 
+==95865== LEAK SUMMARY:
+==95865==    definitely lost: 0 bytes in 0 blocks
+==95865==    indirectly lost: 0 bytes in 0 blocks
+==95865==      possibly lost: 8,864 bytes in 8 blocks
+==95865==    still reachable: 14,588 bytes in 162 blocks
+==95865==         suppressed: 0 bytes in 0 blocks
+==95865== 
+==95865== ERROR SUMMARY: 7 errors from 7 contexts (suppressed: 396 from 7)
+--95865-- 
+--95865-- used_suppression:      1 OSX1014:dyld-3 /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/default.supp:742
+--95865-- used_suppression:    395 OSX1014:dyld-1 /usr/local/Cellar/valgrind/HEAD-adaae87/lib/valgrind/default.supp:726
+==95865== 
+==95865== ERROR SUMMARY: 7 errors from 7 contexts (suppressed: 396 from 7)

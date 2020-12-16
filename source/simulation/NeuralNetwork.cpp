@@ -50,6 +50,9 @@ ActivationLayer::~ActivationLayer() {
 	}
 }
 */
+
+
+
 const double initial_model_bias[] = {0.08060145, -0.08060154};
 const double initial_model_weights[] = {
 		0.07168999,  0.07093393,  0.14018372,  0.14018327,  0.05810054,
@@ -168,6 +171,9 @@ FCLayer::FCLayer (int input_sz, int output_sz,
 					int batch, bool default_weight) {
 	input_size = input_sz;
 	output_size = output_sz;
+	batch_size = batch;
+	quant_zero_point = zero_point;
+	quant_scale = scale;
 
 	cout << "set input size to: " << input_size << "\n";
 	cout << "set output size to: " << output_size << "\n";
@@ -201,14 +207,10 @@ FCLayer::FCLayer (int input_sz, int output_sz,
 	    }
 	}
 
-	double **output_error_softmax = new double*[batch_size];
+	output_error_softmax = new double*[batch_size];
 	for(int b = 0; b < batch_size; b++) {
 	    output_error_softmax[b] = new double[output_size];
 	}
-
-	batch_size = batch;
-	quant_zero_point = zero_point;
-	quant_scale = scale;
 }
 
 
@@ -337,6 +339,7 @@ double mse(double **pred, int **real, int batch_size, int classes){
 void combined_ce_softmax_prime(double *pred, int *real, double *result, int classes){
 	for(int i = 0; i < classes; i++){
 		result[i] = pred[i] - real[i];
+		//cout << result[i] << "\n";
 		assert(result[i] >= -1 && result[i] <= 1);
 	}
 }
@@ -359,11 +362,9 @@ void FCLayer::backward (double **output, int **ground_truth,
 						double learning_rate, double lambda) {
 
 	//double **output_error = new double*[batch_size];
-	double **output_error_softmax = new double*[batch_size];
 
 	for(int b = 0; b < batch_size; b++) {
 	    //output_error[b] = new double[output_size];
-	    output_error_softmax[b] = new double[output_size];
 	    //cross_entropy_prime(output[b], ground_truth[b], output_error[b], output_size);
 	    //softmax_prime(output_error[b], output_error_softmax[b], output_size);
 	    combined_ce_softmax_prime(output[b], ground_truth[b], output_error_softmax[b], output_size);
