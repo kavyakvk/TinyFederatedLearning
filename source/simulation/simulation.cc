@@ -16,8 +16,8 @@
 
 using namespace std;
 
-int main_sim(bool perf, bool tf, bool custom){
-	srand (time(NULL));
+int main_sim(bool perf, bool tf, bool custom, 
+			int fl_devices, int local_episodes, int batch_size, int epochs){
 	//int argc, char** argv
 	int input_size = -1;
 	double quant_scale = 0.04379776492714882;
@@ -32,14 +32,7 @@ int main_sim(bool perf, bool tf, bool custom){
 	}
 	
 	int output_size = 2;
-	int fl_devices = 1;//stoi(argv[1]); //number of devices in the simulation
-	int local_episodes = 10;//stoi(argv[2]); //number of local epochs each device trains for
-	//int data_per_device = 3;//stoi(argv[3]); //number of examples per device
-	//int epoch_data_per_device = 9;//stoi(argv[4]); // number of examples during a given epoch
-	int batch_size = 20;//stoi(argv[5]); //batch size for the devices, epoch_data_per_device / batch_size = an int
-	int val_batches = 200;
-	int epochs = 200;//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
-	//int data_per_round = data_per_device / epochs;
+	int val_batches = batch_size*10;
 
 	assert(8000 >= epochs*fl_devices*batch_size);
 	assert(2000 >= val_batches*fl_devices);
@@ -129,7 +122,7 @@ int main_sim(bool perf, bool tf, bool custom){
 
 	double data_val;
 	int gt_val;
-	double learning_rate = 0.01;
+	double learning_rate = 0.1;
 	double lambda = 0.0001;
 	//throw out first line if CSV
 	//getline(data_file, line_data);
@@ -168,19 +161,16 @@ int main_sim(bool perf, bool tf, bool custom){
 				}
 				assert(sum == 1);
 			}
-			cout << "epoch: " << epoch << " device: " << d << "\n";
+			cout << "epoch: " << epoch << " device: " << d << " ";
 			FL_round_simulation(input_data[d], nullptr, ground_truth[d], local_episodes, learning_rate, 
 								NNmodel, lambda, false, false, false);
-		}
 
-		//VALIDATION ACC FOR EACH DEVICE
-		ifstream data_file_val(embedding_data_val);
-		ifstream gt_file_val(gt_data_val);
-		if(!data_file_val.is_open()) throw runtime_error("Could not open data file");
-		if(!gt_file_val.is_open()) throw runtime_error("Could not open gt file");
+			//VALIDATION ACC FOR EACH DEVICE
+			ifstream data_file_val(embedding_data_val);
+			ifstream gt_file_val(gt_data_val);
+			if(!data_file_val.is_open()) throw runtime_error("Could not open data file");
+			if(!gt_file_val.is_open()) throw runtime_error("Could not open gt file");
 
-		for(int d = 0; d < fl_devices; d++){
-			FCLayer* NNmodel = &(devices[d]);
 			double acc = 0.0;
 			for(int v = 0; v < val_batches/batch_size; v++){
 				for(int b = 0; b < batch_size; b++) {
@@ -215,7 +205,9 @@ int main_sim(bool perf, bool tf, bool custom){
 				//calculate accuracy for batches
 				acc += accuracy(output_val, ground_truth_val[d], batch_size, output_size)/(val_batches/batch_size);
 			}
-			cout << "\t val acc: " << acc << "\n";
+			cout << " val acc: " << acc << "\n";
+			data_file_val.close();
+			gt_file_val.close();
 		}
 		
 		//WEIGHT AVERAGING FOR EACH DEVICE
@@ -240,7 +232,7 @@ int main_sim(bool perf, bool tf, bool custom){
 			devices[d].set_weights_bias(server_weights, server_bias);
 		}
 
-		//learning_rate = 0.1 * pow(0.96, (epoch*batch_size / 10000));
+		learning_rate = 0.1 * pow(0.96, (epoch*batch_size / 1000));
 		
 	}
 
@@ -445,7 +437,50 @@ void extract_features(double *input, double *output){
 	cout << "hi";
 }
 
-int main(){
-	int i = main_sim(false, true, false);
+int main_command_line(int argc, char **argv){
+	//int fl_devices, int local_episodes, int batch_size, int epochs
+	//1 1 10 20 300 is what works
+	//1 1 1 20 400 is the default implementation in keras / tf
+	int output_size = 2;
+
+	int fl_devices = stoi(argv[2]); //number of devices in the simulation
+	int local_episodes = stoi(argv[3]); //number of local epochs each device trains for
+	int batch_size = stoi(argv[4]); //batch size for the devices, epoch_data_per_device / batch_size = an int
+	int epochs = 8000/(batch_size*fl_devices);//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+	cout << "============================\n";
+	cout << "fl_devices " << fl_devices << " local_episodes " << local_episodes << " batch_size " << batch_size << "\n";
+	if(stoi(argv[1]) == 0){
+		int i = main_sim(true, false, false, fl_devices, local_episodes, batch_size, epochs);
+	}else if(stoi(argv[1]) == 1){
+		int i = main_sim(false, true, false, fl_devices, local_episodes, batch_size, epochs);
+	}else{
+		int i = main_sim(false, false, true, fl_devices, local_episodes, batch_size, epochs);
+	}
 	//int j = simple_testing_main();
+	return 1;
+}
+
+int main(int argc, char **argv){
+	//x axes: # devices, # local episodes, batch size
+	int output_size = 2;
+
+	srand (time(NULL));
+
+	cout << "EXPERIMENT: LOCAL EPISODES\n"; 
+	for(int a = 1; a < 11; a++){
+		int fl_devices = 2; //number of devices in the simulation
+		int local_episodes = a; //number of local epochs each device trains for
+		int batch_size = 20; //batch size for the devices, epoch_data_per_device / batch_size = an int
+		int epochs = 8000/(batch_size*fl_devices);//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+		cout << "============================\n";
+		cout << "START: fl_devices " << fl_devices << " local_episodes " << local_episodes << " batch_size " << batch_size << "\n";
+		int i = 0;
+		for(int trials = 0; trials < 20; trials++){
+			cout << "TRIAL " << trials << "\n";
+			i = main_sim(false, true, false, fl_devices, local_episodes, batch_size, epochs);
+			cout << "END TRIAL\n";
+		}
+	}
+	//int j = simple_testing_main();
+	return 1;
 }
