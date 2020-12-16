@@ -521,7 +521,10 @@ void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, in
 		double error = cross_entropy_loss(output, ground_truth, model->batch_size, model->output_size)
 						+l2_error;
 		double acc = accuracy(output, ground_truth, model->batch_size, model->output_size);
-		cout << "\tlocal episode : " << epi << " error: " << error << " accuracy: " << acc << "\n";
+		if(epi == local_episodes-1){
+			cout << " train acc: " << acc;
+		}
+		//cout << "\tlocal episode : " << epi << " error: " << error << " accuracy: " << acc << "\n";
 
 		//backward
 		model->backward(output, ground_truth, input_error, input_float, learning_rate, lambda);

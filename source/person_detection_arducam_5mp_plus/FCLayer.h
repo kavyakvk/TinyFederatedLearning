@@ -7,14 +7,15 @@ class FCLayer {
         double quant_scale;
         double *bias;
         double **weights;
+        double **output_error_softmax;
 
         FCLayer();
         FCLayer (int input_sz, int output_sz, double scale, 
-        			int zero_point, int batch, bool default_weight);
+                    int zero_point, int batch, bool default_weight);
         void forward (double **input_float, double **output);
         void backward (double **output, int **ground_truth, 
-    						double **input_error, double **input_float,
-    						double learning_rate); 
+                            double **input_error, double **input_float,
+                            double learning_rate, double lambda); 
         void dequantize(int *input_data, double *input_float);
         void cleanup();
         ~FCLayer();
