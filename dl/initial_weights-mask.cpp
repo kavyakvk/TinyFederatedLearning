@@ -1,6 +1,6 @@
 #include "FCLayer.h"
 
-// First attempt at initial weights; person detection -> mask detection
+// person detection from ML Perf
 const double initial_model_bias[] = {0.08060145, -0.08060154};
 const double initial_model_weights[] = {
 		0.07168999,  0.07093393,  0.14018372,  0.14018327,  0.05810054,

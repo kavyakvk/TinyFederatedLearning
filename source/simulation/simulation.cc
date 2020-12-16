@@ -16,34 +16,49 @@
 
 using namespace std;
 
-int main_sim(){
+int main_sim(bool perf, bool tf, bool custom){
 	srand (time(NULL));
 	//int argc, char** argv
-	int input_size = 1280;
-	int output_size = 2;
+	int input_size = -1;
 	double quant_scale = 0.04379776492714882;
 	int quant_zero_point = -128;
-	int fl_devices = 2;//stoi(argv[1]); //number of devices in the simulation
-	int local_episodes = 5;//stoi(argv[2]); //number of local epochs each device trains for
+
+	if(perf == true){
+		input_size = 256;
+	}else if(tf == true){
+		input_size = 1280;
+	}else{
+		input_size = 256;
+	}
+	
+	int output_size = 2;
+	int fl_devices = 1;//stoi(argv[1]); //number of devices in the simulation
+	int local_episodes = 10;//stoi(argv[2]); //number of local epochs each device trains for
 	//int data_per_device = 3;//stoi(argv[3]); //number of examples per device
 	//int epoch_data_per_device = 9;//stoi(argv[4]); // number of examples during a given epoch
 	int batch_size = 20;//stoi(argv[5]); //batch size for the devices, epoch_data_per_device / batch_size = an int
-	int epochs = 30;//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
+	int val_batches = 200;
+	int epochs = 200;//stoi(argv[6]); // number of total epochs, epoch_data_per_device * epochs <= 1740
 	//int data_per_round = data_per_device / epochs;
 
 	assert(8000 >= epochs*fl_devices*batch_size);
+	assert(2000 >= val_batches*fl_devices);
+	assert(val_batches%batch_size == 0);
 
 	/*
 		TESTING VALUES:
 		./simulation 1 2 3 9 3 10
 	*/
 
-	std::string embedding_data = "embeddings-cat.txt";
-	std::string gt_data = "ground_truth-cat.txt";
+	std::string embedding_data = "embeddings-cat-tf_train.txt";
+	std::string gt_data = "ground_truth-cat-tf_train.txt";
+	std::string embedding_data_val = "embeddings-cat-tf_val.txt";
+	std::string gt_data_val = "ground_truth-cat-tf_val.txt";
 
 	//READ DATA
 	ifstream data_file(embedding_data);
 	ifstream gt_file(gt_data);
+	
 
 	if(!data_file.is_open()) throw runtime_error("Could not open data file");
 	if(!gt_file.is_open()) throw runtime_error("Could not open gt file");
@@ -57,12 +72,18 @@ int main_sim(){
 		devices[d] = FCLayer(input_size, output_size, quant_scale, quant_zero_point, batch_size, false);
 	}
 
-	//ALLOCATE MEMORY TO STORE DATA FOR ALL DEVICES
+	//ALLOCATE MEMORY TO STORE DATA FOR ALL DEVICES 
 	double ***input_data = new double**[fl_devices];
 	int ***ground_truth = new int**[fl_devices];
+	double ***input_data_val = new double**[fl_devices];
+	int ***ground_truth_val = new int**[fl_devices];
+
 	for(int d = 0; d < fl_devices; d++){
 		input_data[d] = new double*[batch_size];
 		ground_truth[d] = new int*[batch_size];
+		input_data_val[d] = new double*[val_batches];
+		ground_truth_val[d] = new int*[val_batches];
+
 		for(int b = 0; b < batch_size; b++) {
 			input_data[d][b] = new double[input_size];
 			ground_truth[d][b] = new int[output_size];
@@ -73,7 +94,27 @@ int main_sim(){
 				ground_truth[d][b][j] = 0;
 			}
 		}
+
+		for(int b = 0; b < val_batches; b++) {
+			input_data_val[d][b] = new double[input_size];
+			ground_truth_val[d][b] = new int[output_size];
+			for(int i = 0; i < input_size; i++){
+				input_data_val[d][b][i] = 0.0;
+			}
+			for (int j = 0; j < output_size; j++){
+				ground_truth_val[d][b][j] = 0;
+			}
+		}
 	}
+
+	double **output_val = new double*[val_batches];
+	for(int b = 0; b < val_batches; b++) {
+		output_val[b] = new double[output_size];
+		for (int j = 0; j < output_size; j++){
+			output_val[b][j] = 0.0;
+		}
+	}
+	
 
 	//ALLOCATE MEMORY FOR THE SERVER WEIGHTS AND BIAS
 	double **server_weights = new double*[input_size];
@@ -88,7 +129,7 @@ int main_sim(){
 
 	double data_val;
 	int gt_val;
-	double learning_rate = 0.1;
+	double learning_rate = 0.01;
 	double lambda = 0.0001;
 	//throw out first line if CSV
 	//getline(data_file, line_data);
@@ -131,6 +172,51 @@ int main_sim(){
 			FL_round_simulation(input_data[d], nullptr, ground_truth[d], local_episodes, learning_rate, 
 								NNmodel, lambda, false, false, false);
 		}
+
+		//VALIDATION ACC FOR EACH DEVICE
+		ifstream data_file_val(embedding_data_val);
+		ifstream gt_file_val(gt_data_val);
+		if(!data_file_val.is_open()) throw runtime_error("Could not open data file");
+		if(!gt_file_val.is_open()) throw runtime_error("Could not open gt file");
+
+		for(int d = 0; d < fl_devices; d++){
+			FCLayer* NNmodel = &(devices[d]);
+			double acc = 0.0;
+			for(int v = 0; v < val_batches/batch_size; v++){
+				for(int b = 0; b < batch_size; b++) {
+					// Extract the line in the file
+					getline(data_file_val, line_data);
+					getline(gt_file_val, line_gt);
+
+					// Create a stringstream from line
+					stringstream ss_data(line_data);
+					stringstream ss_gt(line_gt);
+
+					for(int i = 0; i < input_size; i++){
+						ss_data >> data_val;
+
+						input_data_val[d][b][i] = data_val;
+					}
+					ss_gt >> gt_val;
+					int sum = 0;
+					for (int j = 0; j < output_size; j++){
+						if(j == gt_val){
+							ground_truth_val[d][b][j] = 1;
+							sum += 1;
+						}else{
+							ground_truth_val[d][b][j] = 0;
+							sum += 0;
+						}
+					}
+					assert(sum == 1);
+				}
+				//predict the data
+				predict(input_data_val[d], NNmodel, output_val, batch_size, output_size);
+				//calculate accuracy for batches
+				acc += accuracy(output_val, ground_truth_val[d], batch_size, output_size)/(val_batches/batch_size);
+			}
+			cout << "\t val acc: " << acc << "\n";
+		}
 		
 		//WEIGHT AVERAGING FOR EACH DEVICE
 		for(int i = 0; i < input_size; i++){
@@ -154,7 +240,7 @@ int main_sim(){
 			devices[d].set_weights_bias(server_weights, server_bias);
 		}
 
-		learning_rate = 0.1 * pow(0.96, (epoch*batch_size / 10000));
+		//learning_rate = 0.1 * pow(0.96, (epoch*batch_size / 10000));
 		
 	}
 
@@ -175,16 +261,27 @@ int main_sim(){
 	}
 
 	//DE-ALLOCATE MEMORY STORING DATA FOR ALL DEVICES
+	for(int b = 0; b < val_batches; b++) {
+		delete [] output_val[b];
+	}
+	delete [] output_val;
+
 	for(int d = 0; d < fl_devices; d++){
 		for(int b = 0; b < batch_size; b++) {
 			delete [] input_data[d][b];
 			delete [] ground_truth[d][b];
+			delete [] input_data_val[d][b];
+			delete [] ground_truth_val[d][b];
 		}
 		delete [] input_data[d];
 		delete [] ground_truth[d];
+		delete [] input_data_val[d];
+		delete [] ground_truth_val[d];
 	}
 	delete [] input_data;
 	delete [] ground_truth;
+	delete [] input_data_val;
+	delete [] ground_truth_val;
 	return 0;
 }
 
@@ -349,6 +446,6 @@ void extract_features(double *input, double *output){
 }
 
 int main(){
-	int i = main_sim();
+	int i = main_sim(false, true, false);
 	//int j = simple_testing_main();
 }

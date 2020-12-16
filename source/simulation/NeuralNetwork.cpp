@@ -51,8 +51,6 @@ ActivationLayer::~ActivationLayer() {
 }
 */
 
-
-
 const double initial_model_bias[] = {0.08558154, -0.08558163};
 const double initial_model_weights[] = {
       0.07168999,  0.07093393,  0.14018372,  0.14018327,  0.05810054,
@@ -435,9 +433,9 @@ void predict(double **input_float, FCLayer *model, double **output, int batch_si
 	for(int b = 0; b < batch_size; b++){
 		for(int j = 0; j < classes; j++){
 			if(output[b][j] >= 0.5){
-				output[b][j] = 1;
+				output[b][j] = 1.0;
 			}else{
-				output[b][j] = 0;
+				output[b][j] = 0.0;
 			}
 		}
 	}
