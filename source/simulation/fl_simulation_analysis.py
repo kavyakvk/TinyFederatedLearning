@@ -13,7 +13,7 @@ num_devices = 2
 results_local_episodes = {} #results[value of exp_parameter][trial][epoch][device][train accuracy, val accuracy]
 with open('simulation-results/results_local_episodes.csv', 'w', newline='') as f:
 	writer = csv.writer(f)
-	writer.writerows(["local_episodes", "trial", "epoch", "average_device_train_accuracy", "average_device_val_accuracy"])
+	writer.writerows([["local_episodes", "trial", "epoch", "average_device_train_accuracy", "average_device_val_accuracy"]])
 
 	for line in file:
 		line = line.strip()
@@ -36,7 +36,7 @@ with open('simulation-results/results_local_episodes.csv', 'w', newline='') as f
 			trial_counter += 1
 			assert(trial_counter == int(line.split(" ")[1]))
 			print("\ttrial ", trial_counter)
-		elif("acc" in line):
+		elif("train acc" in line):
 			spl = line.split(" ")
 			#print(spl)
 			epoch = int(spl[1])
@@ -53,7 +53,7 @@ with open('simulation-results/results_local_episodes.csv', 'w', newline='') as f
 				val_score = sum([results_local_episodes[param_local_episodes][trial_counter][epoch][device][1] for device in range(num_devices)])
 
 				output = [param_local_episodes, trial_counter, epoch, train_score/num_devices, val_score/num_devices]
-				writer.writerows(map(lambda x: [x], output))
+				writer.writerows([output])
 
 	pickle.dump(results_local_episodes, open( "simulation-results/results_local_episodes.p", "wb"))
 
