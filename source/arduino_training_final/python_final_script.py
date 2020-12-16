@@ -58,18 +58,18 @@ def main():
 	init_weights_str = (",".join(map(str, init_weights)) + "|").encode()
 	len_weights_str = len(init_weights_str)
 	weights_iters = len_weights_str // 255
-	print(len_weights_str)
+	# print(len_weights_str)
 
 
 	# Setup connection to Arduino
-	# port = '/dev/cu.usbmodem142301' # change this to what the Arduino Port is
-	# ard = serial.Serial(port,9600,timeout=10)
+	port = '/dev/cu.usbmodem142301' # change this to what the Arduino Port is
+	ard = serial.Serial(port,9600,timeout=10)
 	time.sleep(3) # wait for Arduino
 
 	# For one round
 	i = 0
 	while (i < 1):
-		print('Beginning of a new round')
+		print('Starting a new round')
 
 		# Serial write section
 		ard.flush()
@@ -111,8 +111,11 @@ def main():
 
 		# Send last remaining chars
 		if weights_iters * 255 < len_weights_str:
-			print(f"last remaining: {init_weights_str[weights_iters*255:]}")
+			# print(f"last remaining: {init_weights_str[weights_iters*255:]}")
 			ard.write(init_weights_str[weights_iters*255:])
+			# Read Arduino's response
+			msg = ard.read(ard.inWaiting()) # read all characters in buffer
+			print(f"Arduino received {msg.decode('utf-8')} out of {len_weights_str} bytes")
 
 		# ________GETTING WEIGHTS_________
 		output_weights_str = ''
@@ -121,13 +124,13 @@ def main():
 			time.sleep(5)
 			# Read Arduino's response
 			msg = ard.read(ard.inWaiting()) # read all characters in buffer
-			print(f"Server: receiving weight packet {j} out of {num_packets}")
 			output_weights_str += msg.decode("utf-8")
+			print(f"Server: received {len(output_weights_str)} bytes")
 			# print(f"Mac: received {output_weights_str}")
-		# print(output_weights_str)
-		output_weight_lst = list(map(float, output_weights_str.split()))
-		print(output_weight_lst)
-		print(len(output_weight_lst))
+		print(output_weights_str)
+		# output_weight_lst = list(map(float, output_weights_str.split()))
+		# print(output_weight_lst)
+		# print(len(output_weight_lst))
 
 
 		i = i + 1
