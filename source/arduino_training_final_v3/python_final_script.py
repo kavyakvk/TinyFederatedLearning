@@ -95,6 +95,7 @@ def main():
 		# Read Arduino's response
 		# msg = ard.read(ard.inWaiting()) # read all characters in buffer
 		# print(f"Mac: received {msg}")
+		prev = time.time()
 
 		# _________SENDING WEIGHTS___________
 		for j in range(weights_iters):
@@ -113,10 +114,13 @@ def main():
 		if weights_iters * 255 < len_weights_str:
 			# print(f"last remaining: {init_weights_str[weights_iters*255:]}")
 			ard.write(init_weights_str[weights_iters*255:])
-			time.sleep(1)
+			# time.sleep(1)
 			# Read Arduino's response
 			msg = ard.read(ard.inWaiting()) # read all characters in buffer
-			print(f"Arduino received {msg.decode('utf-8')} out of {len_weights_str} bytes")
+			# print(f"Arduino received {msg.decode('utf-8')} out of {len_weights_str} bytes")
+		now = time.time()
+		print(f"Sending weights to Arduino took: {time.time() - prev} seconds")
+		prev = time.time()
 
 		# ________GETTING WEIGHTS_________
 		output_weights_str = ''
@@ -133,6 +137,8 @@ def main():
 		# print(output_weight_lst)
 		# print(len(output_weight_lst))
 
+		now = time.time()
+		print(f"Receiving updated weights from Arduino took: {now - prev} seconds")
 
 		i = i + 1
 	else:

@@ -65,8 +65,8 @@ static int ndx = 0;  // For keeping track where in the char array to input
 // static int numChars = input_size * batch_size;
 static bool endOfResponse = false; 
 static char * pch;
-//static unsigned long StartTime = millis();
-//static unsigned long CurrentTime = millis();
+static unsigned long StartTime = millis();
+static unsigned long CurrentTime = millis();
 
 // The name of this function is important for Arduino compatibility.
 void setup() {
@@ -147,10 +147,10 @@ void loop() {
     TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed.");
   }
   TfLiteTensor* output = interpreter->output(0);
-//  CurrentTime = millis();
-//  Serial.print("Finished image capture and inference in ");
-//  Serial.print(CurrentTime - StartTime);
-//  Serial.println("ms");
+  CurrentTime = millis();
+  Serial.print("Finished image capture and inference in ");
+  Serial.print(CurrentTime - StartTime);
+  Serial.println("ms");
 
   // Devices
   FCLayer devices[fl_devices];
@@ -181,11 +181,11 @@ void loop() {
   }
 
   FL_round_simulation(double_data, input_data, ground_truth, local_epochs, 0.1, NNmodel, 0.001, true, false, true);
-//  StartTime = CurrentTime;
-//  CurrentTime = millis();
-//  Serial.print("Finished training in ");
-//  Serial.print(CurrentTime - StartTime);
-//  Serial.println("ms");
+  StartTime = CurrentTime;
+  CurrentTime = millis();
+  Serial.print("Finished training in ");
+  Serial.print(CurrentTime - StartTime);
+  Serial.println("ms");
 
   // if(Serial.available() > 0){
   if (true){
