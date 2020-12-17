@@ -455,8 +455,8 @@ void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, in
 			}else{
 				Serial.print("\tEPISODE");
         		Serial.println(epi);
-        		Serial.print("\tforward\n\t\t bias loaded");
-				Serial.print(model->bias[0], model->bias[1]);
+//        		Serial.print("\tforward\n\t\t bias loaded");
+//				Serial.print(model->bias[0], model->bias[1]);
 			}
 		}
 		//forward
@@ -466,9 +466,9 @@ void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, in
 			if(local == true){
 				cout << "\tsoftmax " << output[0][0] << " " << output[0][1] << "\n";
 			}else{
-				Serial.print("\tsoftmax");
-				Serial.println(output[0][0]);
-				Serial.println(output[0][1]);
+//				Serial.print("\tsoftmax");
+//				Serial.println(output[0][0]);
+//				Serial.println(output[0][1]);
 			}
 		}
 

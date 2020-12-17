@@ -249,7 +249,7 @@ void loop() {
      }
 
      // Set weights
-//     NNmodel->set_weights_bias(init_weights, init_bias);
+     NNmodel->set_weights_bias(init_weights, init_bias);
      
    }
   }
