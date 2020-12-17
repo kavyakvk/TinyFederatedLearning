@@ -455,8 +455,8 @@ void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, in
 			}else{
 				Serial.print("\tEPISODE");
         		Serial.println(epi);
-        		Serial.print("\tforward\n\t\t bias loaded");
-				Serial.print(model->bias[0], model->bias[1]);
+        		// Serial.print("\tforward\n\t\t bias loaded");
+				// Serial.print(model->bias[0], model->bias[1]);
 			}
 		}
 		//forward
@@ -466,9 +466,9 @@ void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, in
 			if(local == true){
 				cout << "\tsoftmax " << output[0][0] << " " << output[0][1] << "\n";
 			}else{
-				Serial.print("\tsoftmax");
-				Serial.println(output[0][0]);
-				Serial.println(output[0][1]);
+				// Serial.print("\tsoftmax");
+				// Serial.println(output[0][0]);
+				// Serial.println(output[0][1]);
 			}
 		}
 
@@ -488,7 +488,7 @@ void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, in
 			if(local == true){
 				cout << "\tbackward\n";
 			}else{
-				Serial.print("\tbackward\n");
+				Serial.print("\tFinished backward pass\n");
 			}
 		}
 		//reset input_error and output in forward and backward 
@@ -498,7 +498,7 @@ void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, in
 		if(local == true){
 			cout << "\tdone loop\n";
 		}else{
-			Serial.print("\tdone loop\n");
+			// Serial.print("\tdone loop\n");
 		}
 	}
 
@@ -517,7 +517,7 @@ void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, in
 		if(local == true){
 			cout << "\tdone de-allocation\n";
 		}else{
-			Serial.print("\tdone de-allocation\n");
+			// Serial.print("\tdone de-allocation\n");
 		}
 	}
 }

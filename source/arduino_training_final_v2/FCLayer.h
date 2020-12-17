@@ -22,11 +22,8 @@ class FCLayer {
         void set_weights_bias(double **new_weights, double *new_bias);
 };
 
-// class KMeans{
-//     public:
-
-// }
-
+// void FL_round_simulation(double **input_float, int **ground_truth, int local_episodes, 
+//                         double learning_rate, FCLayer *model, bool verbose, bool local);
 void FL_round_simulation(double **input_f, int **input_i, int **ground_truth, int local_episodes, 
                         double learning_rate, FCLayer *model, double lambda, 
                         bool verbose, bool local, bool unquantize);
