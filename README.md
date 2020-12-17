@@ -3,8 +3,7 @@ TinyML has rose to popularity in an era where data is everywhere. However, the d
 
 ## File Structure and Important Files
 * dl
-* source > 
-  * arduino_training_final_v3: the .ino file has the implementation of our FL code for the Arduino IDE to compile
+* source > arduino_training_final_v3: the .ino file has the implementation of our FL code for the Arduino IDE to compile
   * python_final_script.py acts as the "central server" for the arduino
 * source > simulation: 
   * NeuralNetwork.cpp has our FC implementation and the FL implementation, simulation.cc is the file with the code necessary to run our simulations.
