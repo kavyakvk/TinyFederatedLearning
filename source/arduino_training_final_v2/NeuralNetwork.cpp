@@ -219,7 +219,7 @@ void FCLayer::dequantize(int *input_data, double *input_float){
   for(int i = 0; i < input_size; i++){
     // input_float[i] = (input_data[i]-quant_zero_point)*quant_scale;
     // input_float[i] = (input_data[i]+128)*0.01;
-    input_float[i] = 0.01
+    input_float[i] = 0.01;
   }
 }
 
