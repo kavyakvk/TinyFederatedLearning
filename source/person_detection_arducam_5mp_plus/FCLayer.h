@@ -23,7 +23,7 @@ class FCLayer {
 };
 
 void FL_round_simulation(double **input_float, int **ground_truth, int local_episodes, 
-                        double learning_rate, FCLayer *model, bool verbose, bool local);
+                        double learning_rate, FCLayer *model, bool verbose, bool local, bool unquantize);
 
 void FL_round_quantize(int **input_data, int **ground_truth, int local_epochs, 
                 double learning_rate, FCLayer *model);
