@@ -1,5 +1,7 @@
-#include "FCLayer.h"
-
+//#include "FCLayer.h"
+//quanization numbers
+double quant_scale = 0.04379776492714882;
+int quant_zero_point = -128;
 // person detection from ML Perf
 const double initial_model_bias[] = {0.08060145, -0.08060154};
 const double initial_model_weights[] = {
