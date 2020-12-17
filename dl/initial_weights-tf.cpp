@@ -1,4 +1,4 @@
-#include "FCLayer.h"
+//#include "FCLayer.h"
 // Trained on 8k dog / no-dog binary classification for mobilenetv2 TF (bigger)
 
 const double initial_model_bias[] = {0.00928613, -0.01084625};
