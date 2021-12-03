@@ -1,7 +1,8 @@
 # TinyFederatedLearning
 TinyML has rose to popularity in an era where data is everywhere. However, the data that is in most demand is subject to strict privacy and security guarantees. In addition, the deployment of TinyML hardware in the real world has significant memory and communication constraints that traditional ML fails to address. In light of these challenges, we persent TinyFedTL, the first implementation of federated transfer learning on a resource- constrained microcontroller. 
 
-Both an Ardunio and accompanied C++ implementation (without standard library so it will run on-device!)
+* C++ implementation to accompany Arduino code is provided (without standard library so it will run on-device!)
+* Please see our demo video presentation here: https://www.youtube.com/watch?v=KSaidr3ZN9M
 
 ## File Structure and Important Files
 * dl
